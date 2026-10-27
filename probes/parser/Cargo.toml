@@ -1,0 +1,11 @@
+[package]
+name = "osv-parser-probe"
+version = "0.0.0"
+edition = "2021"
+rust-version = "1.95"
+publish = false
+
+[dependencies]
+vhdl_syntax = { git = "https://github.com/VHDL-LS/rust_hdl.git", branch = "master" }
+
+[workspace]
