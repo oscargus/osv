@@ -2,7 +2,7 @@
 
 This is an execution plan for the simulator described in [project.md](project.md), including the additional requirement that artifacts use binary serialization by default and also support inspectable RON serialization.
 
-Chunks `001`-`010` are complete: parser/source verification, language/native-package inventories, execution/artifact decisions, the Rust library/binary and GitHub Actions bootstrap, shared source management/diagnostics, reusable fixture/golden helpers, owned artifact models/identity, bounded binary/RON codecs, artifact inspection/conversion commands, and the versioned library artifact store. Chunk `004` has passing hosted checks on Linux x86-64/ARM64, Windows, and macOS. Production VHDL analysis, elaboration, and simulation are not implemented; checked chunks and their handoffs record verified progress.
+Chunks `001`-`011` are complete, covering the foundation, artifact tools/store, and primitive values/time. Chunk `004` has passing hosted checks on Linux x86-64/ARM64, Windows, and macOS. Production VHDL analysis, elaboration, and simulation are not implemented; checked chunks and their handoffs record verified progress.
 
 ## How to Run This Plan
 
@@ -249,12 +249,14 @@ Waveform generation is optional and is separate from artifact serialization: VCD
 
 ## B. Values and Frontend Bootstrap
 
-### [ ] 011 - Implement Primitive Values and Simulation Time
+### [x] 011 - Implement Primitive Values and Simulation Time
 
 - **Work:** Add boolean, bit, enumeration, checked integer, initial real representation, and physical/time primitives following chunk 003's documented limits. Represent time as checked integer ticks and provide common value/range errors.
 - **Checks:** Test integer boundaries, overflow, invalid enum positions, time-unit conversion, resolution loss, negative-delay rejection, and both-codec round trips of boundary values.
 - **Done When:** Primitive values have explicit semantics and portable serialization, not unchecked host-language behavior.
 - **Do Not:** Use floating-point timestamps or assume Rust overflow/casts match VHDL rules.
+
+**Handoff (2026-10-27):** Complete. See [docs/primitive-values.md](docs/primitive-values.md) and [src/values/mod.rs](src/values/mod.rs). Added `PrimitiveValue`, two-state bits, type-linked enum/physical records, checked signed integers, finite bit-exact `RealValue`, signed-femtosecond `TimeValue`, six explicit `TimeResolution` policies, and validated nonnegative `SimulationTime`; common `ValueError` distinguishes overflow, range/type/position, zero-divisor, nonfinite, scale, negative-delay, and resolution-loss errors. Enum positions require contextual validation against their declaration; real/tick invariants also validate during decoding. The first checked-add overflow test passed immediately after the small edit. Nine focused tests cover signed boundaries/overflow, enum identity/positions, real signed-zero/subnormal bits, physical conversion, time units/resolutions/loss/delays, zero/end-time advancement, both-codec boundary fixtures, and invalid decoding. Root formatting/check/strict Clippy/all-target tests pass (90 total). No dependencies or artifact-envelope schema changed; no VHDL interpreter, package body, scheduler, full real/physical arithmetic, or later array/vector feature was introduced. The fixture is explicitly synthetic until real analysis enables VHDL assertions. No blockers; `012` should keep bounds/direction separate from storage.
 
 ### [ ] 012 - Implement Array Bounds and Index Mapping
 

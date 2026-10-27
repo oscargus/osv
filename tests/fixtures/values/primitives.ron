@@ -1,0 +1,24 @@
+(
+    kind: HarnessSelfTest,
+    sources: [],
+    expected: (
+        stage: Artifact,
+        diagnostics: [],
+        exit_status: 0,
+        result: [
+            Boolean(false),
+            Boolean(true),
+            Bit(Zero),
+            Bit(One),
+            Enumeration(EnumerationValue(type_id: TypeId(3), position: 1)),
+            Integer(IntegerValue(-9223372036854775808)),
+            Integer(IntegerValue(9223372036854775807)),
+            Real(RealValue(real_bits: 9223372036854775808)),
+            Real(RealValue(real_bits: 1)),
+            Physical(PhysicalValue(type_id: TypeId(2), primary_units: -9223372036854775808)),
+            Time(TimeValue(-9223372036854775808)),
+            Time(TimeValue(9223372036854775807)),
+        ],
+        output: "",
+    ),
+)
