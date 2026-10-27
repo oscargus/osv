@@ -1,0 +1,11 @@
+(
+    kind: ParserProbe,
+    sources: ["vhdl/empty-entity.vhd"],
+    expected: (
+        stage: Analysis,
+        diagnostics: [],
+        exit_status: 0,
+        result: (design_units: 1),
+        output: "",
+    ),
+)

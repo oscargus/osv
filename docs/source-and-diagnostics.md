@@ -110,9 +110,10 @@ and [../tests/snapshots/diagnostics/unavailable.ron](../tests/snapshots/diagnost
 They are readable RON strings, using escapes for non-ASCII text. Tests strip
 only trailing line whitespace for snapshot comparison and independently reject
 CR/ANSI output. Expected snapshot loading accepts both LF and CRLF checkouts;
-this does not normalize the actual diagnostic output. There is no fixture-metadata
-or golden-update framework from chunk `006` yet, and no production parser adapter
-from chunk `015`.
+this does not normalize the actual diagnostic output. Chunk `006` shares these
+golden helpers and adds typed fixture metadata; see [fixtures.md](fixtures.md).
+There is no automatic golden-update mode or production parser adapter from
+chunk `015`.
 
 ```sh
 cargo test --test source --locked

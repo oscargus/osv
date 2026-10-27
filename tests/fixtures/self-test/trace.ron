@@ -1,0 +1,30 @@
+(
+    kind: HarnessSelfTest,
+    sources: [],
+    expected: (
+        stage: Simulation,
+        diagnostics: [],
+        exit_status: 0,
+        result: [
+            (
+                time_fs: 0,
+                delta: 0,
+                phase: Update,
+                event: Signal(name: "synthetic.root.flag", value: false),
+            ),
+            (
+                time_fs: 0,
+                delta: 1,
+                phase: Update,
+                event: Signal(name: "synthetic.root.flag", value: true),
+            ),
+            (
+                time_fs: 1000,
+                delta: 0,
+                phase: Observe,
+                event: Report("harness sample"),
+            ),
+        ],
+        output: "",
+    ),
+)

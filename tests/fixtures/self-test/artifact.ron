@@ -1,0 +1,15 @@
+(
+    kind: HarnessSelfTest,
+    sources: [],
+    expected: (
+        stage: Artifact,
+        diagnostics: [],
+        exit_status: 0,
+        result: (
+            top: "synthetic.root",
+            architecture: "sample",
+            signals: [(name: "synthetic.root.flag", initial: false)],
+        ),
+        output: "",
+    ),
+)

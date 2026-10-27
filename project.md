@@ -38,3 +38,5 @@ VHDL-fixture-file-based tests are preferred, ideally with VHDL asserts to prove 
 For command line arguments, clap should be used.
 
 Split the project and tests over multiple files in a sensible way so that one does not end up with just a few single files with 10k+ lines.
+
+Note that all VHDL files are defined as being encoded as ISO 8859-1 (latin 1).

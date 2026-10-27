@@ -1,8 +1,12 @@
+#[path = "support/golden.rs"]
+mod golden;
+
 use std::{
     io::{self, Write},
     path::Path,
 };
 
+use golden::{expected_output, rendered};
 use osv::{
     diagnostics::{
         ContextKind, Diagnostic, DiagnosticCode, DiagnosticContext, DiagnosticNote,
@@ -11,24 +15,6 @@ use osv::{
     source::{ByteSpan, SourceFile, SourceId, SourceMap},
 };
 use vhdl_syntax::{parser, standard::VHDLStandard};
-
-fn rendered(diagnostic: &Diagnostic, sources: &SourceMap) -> String {
-    let mut output = Vec::new();
-    render(diagnostic, sources, &mut output).unwrap();
-    let output = String::from_utf8(output).unwrap();
-    assert!(!output.contains('\r'));
-    assert!(!output.contains('\x1b'));
-    output
-        .lines()
-        .map(str::trim_end)
-        .collect::<Vec<_>>()
-        .join("\n")
-        + "\n"
-}
-
-fn expected_output(snapshot: &str) -> String {
-    ron::from_str(&snapshot.replace("\r\n", "\n")).unwrap()
-}
 
 fn type_mismatch() -> (SourceMap, Diagnostic) {
     let mut sources = SourceMap::default();
