@@ -1,0 +1,31 @@
+ArtifactEnvelope(
+    schema_version: 1,
+    compiler_compatibility: 1,
+    compiler_version: "synthetic fixture",
+    language: Vhdl2008,
+    identity: (library: Basic("work"), primary: Basic("synthetic_fixture"), kind: Entity),
+    sources: [],
+    units: [(
+        id: UnitId(7),
+        identity: (library: Basic("work"), primary: Basic("synthetic_fixture"), kind: Entity),
+        parent: None,
+        span: None,
+    )],
+    types: [(
+        id: TypeId(3),
+        name: Basic("boolean"),
+        declaration: None,
+        definition: Scalar(Boolean),
+    )],
+    symbols: [(
+        id: SymbolId(5),
+        unit: UnitId(7),
+        name: Basic("flag"),
+        kind: Signal,
+        type_id: Some(TypeId(3)),
+        span: None,
+    )],
+    dependencies: [],
+    native_requirements: [],
+    payload: Analysis((unit: UnitId(7), declarations: [SymbolId(5)])),
+)

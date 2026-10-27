@@ -47,6 +47,11 @@ pub enum DiagnosticCode {
     CliUnimplemented,
     CliUsage,
     CliIo,
+    ArtifactFormat,
+    ArtifactLimit,
+    ArtifactCompatibility,
+    ArtifactValidation,
+    ArtifactIo,
 }
 
 impl fmt::Display for DiagnosticCode {
@@ -57,6 +62,11 @@ impl fmt::Display for DiagnosticCode {
             Self::CliUnimplemented => "OSV-CLI-UNIMPLEMENTED",
             Self::CliUsage => "OSV-CLI-USAGE",
             Self::CliIo => "OSV-CLI-IO",
+            Self::ArtifactFormat => "OSV-ARTIFACT-FORMAT",
+            Self::ArtifactLimit => "OSV-ARTIFACT-LIMIT",
+            Self::ArtifactCompatibility => "OSV-ARTIFACT-COMPATIBILITY",
+            Self::ArtifactValidation => "OSV-ARTIFACT-VALIDATION",
+            Self::ArtifactIo => "OSV-ARTIFACT-IO",
         })
     }
 }
