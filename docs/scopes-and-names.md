@@ -62,8 +62,9 @@ unqualified strings across libraries.
 `UnitRegistry::from_artifact` restores validated unit/scope/symbol identities
 without renumbering, opening sources, or inventing missing source locations.
 Saved symbol IDs therefore remain the lookup result after binary/RON reload.
-The persistent contract remains schema `2` from `016a`; transient syntax views
-and registration caches are never serialized into the artifact.
+The persisted scope fields remain those introduced in schema `2` by `016a`;
+schema `3` adds native binding data in `017b`. Transient syntax views and
+registration caches are never serialized into the artifact.
 
 The initial context subset recognizes available `std`/current-library clauses.
 Unavailable libraries fail explicitly. Full `use`-clause visibility currently

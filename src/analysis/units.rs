@@ -118,6 +118,9 @@ impl UnitRegistry {
                     crate::artifacts::SymbolKind::Signal => DeclarationKind::Signal,
                     crate::artifacts::SymbolKind::Variable => DeclarationKind::Variable,
                     crate::artifacts::SymbolKind::Subprogram => DeclarationKind::Subprogram,
+                    crate::artifacts::SymbolKind::EnumerationLiteral
+                    | crate::artifacts::SymbolKind::PhysicalUnit => DeclarationKind::Constant,
+                    crate::artifacts::SymbolKind::Attribute => DeclarationKind::Type,
                 },
                 span: symbol.span,
             })

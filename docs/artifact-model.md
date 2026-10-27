@@ -9,7 +9,7 @@ commands and library catalogs belong to `009` and `010`.
 
 ## Envelope and References
 
-`ArtifactEnvelope` carries schema version `2`, compiler compatibility epoch
+`ArtifactEnvelope` carries schema version `3`, compiler compatibility epoch
 `1`, a diagnostic compiler-version string, the sole `Vhdl2008` revision,
 logical unit identity, source/unit/type/symbol tables, exact dependencies,
 native declaration-set fingerprints and ABI requirements, and a typed payload.
@@ -39,6 +39,12 @@ full lexical, reserved-word, visibility, and declaration rules remain owned by
 the frontend. Validation happens before normalization, so a non-Latin-1 input
 cannot become accepted through Unicode case folding. Unit identities and
 native/dependency keys are checked after name normalization as well.
+
+Schema `3` also distinguishes character literal and typed operator names and
+adds `TypeDefinition::Native` plus explicit per-symbol native bindings. See
+[standard-prelude.md](standard-prelude.md). Native identities require the exact
+trusted standard unit/declaration-set/ABI and validated type/signature metadata;
+they are not inferred from spelling. Previous schemas are rejected explicitly.
 
 The initial type records describe scalar, enumeration, and unconstrained
 subtype identity, not primitive arithmetic or runtime storage. Symbols retain

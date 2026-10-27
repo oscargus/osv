@@ -1,6 +1,7 @@
 # Native Declaration Identity
 
-Plan child `017a`; prelude installation remains `017b`. The registry in
+Plan child `017a`; prelude installation is documented in
+[standard-prelude.md](standard-prelude.md). The registry in
 [../src/intrinsics/mod.rs](../src/intrinsics/mod.rs) is metadata and validated
 references, not an executing kernel, standard-package body, or blanket
 standard-library coverage claim.

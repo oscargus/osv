@@ -3,6 +3,7 @@ mod codec;
 mod files;
 mod identity;
 mod model;
+mod native;
 mod scopes;
 pub mod store;
 mod validate;

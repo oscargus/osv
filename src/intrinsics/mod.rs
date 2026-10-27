@@ -1,5 +1,8 @@
+mod prelude;
 mod profiles;
 mod types;
+
+pub use prelude::{PreludeError, PreludeIds, install_standard, standard_prelude};
 
 use serde::{Deserialize, Serialize};
 
@@ -11,7 +14,7 @@ pub use types::{
     NativeAttribute, NativeLiteral, NativeType, NativeTypeDefinition, NativeTypeShape, NativeUnit,
 };
 
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub enum Operator {
     Add,
     Subtract,
@@ -128,6 +131,15 @@ pub struct DeclarationIdentity {
 pub struct IntrinsicReference {
     pub id: IntrinsicId,
     pub declaration: DeclarationIdentity,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub enum NativeBinding {
+    Type(NativeType),
+    Literal { type_id: NativeType, position: u32 },
+    PhysicalUnit { primary_units: i64 },
+    Attribute { type_id: NativeType },
+    Subprogram(IntrinsicReference),
 }
 
 pub struct IntrinsicRegistry {

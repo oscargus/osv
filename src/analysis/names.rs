@@ -43,4 +43,30 @@ impl<'artifact> ScopeLookup<'artifact> {
             scope = parent;
         }
     }
+
+    pub fn lookup_with_standard(
+        &self,
+        scope: ScopeId,
+        name: &Identifier,
+    ) -> Result<Vec<&'artifact SymbolRecord>, ArtifactError> {
+        let found = self.lookup(scope, name)?;
+        if !found.is_empty() {
+            return Ok(found);
+        }
+        let unit = self.artifact.units.iter().find(|unit| {
+            unit.identity.library.normalized() == Identifier::Basic("std".into())
+                && unit.identity.primary.normalized() == Identifier::Basic("standard".into())
+                && unit.identity.kind == crate::artifacts::UnitKind::Package
+        });
+        let Some(unit) = unit else {
+            return Ok(Vec::new());
+        };
+        let scope = self
+            .artifact
+            .scopes
+            .iter()
+            .find(|scope| scope.kind == crate::artifacts::ScopeKind::Unit(unit.id))
+            .ok_or(ArtifactError::MissingUnitScope(unit.id))?;
+        self.lookup(scope.id, name)
+    }
 }

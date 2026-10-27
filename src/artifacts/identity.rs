@@ -1,5 +1,6 @@
 use std::{fmt, path::Path};
 
+use crate::intrinsics::{IntrinsicName, NativeBinding};
 use crate::{diagnostics::display_path, source::SourceFile};
 
 use super::{
@@ -58,6 +59,12 @@ impl ArtifactEnvelope {
         }
         for symbol in &mut artifact.symbols {
             symbol.name = symbol.name.normalized();
+            if let Some(NativeBinding::Subprogram(reference)) = &mut symbol.native {
+                reference.declaration.unit = reference.declaration.unit.normalized();
+                if let IntrinsicName::Function(name) = &mut reference.declaration.signature.name {
+                    *name = name.normalized();
+                }
+            }
         }
         for dependency in &mut artifact.dependencies {
             dependency.identity = dependency.identity.normalized();

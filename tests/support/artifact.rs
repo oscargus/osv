@@ -57,6 +57,7 @@ pub fn sample() -> ArtifactEnvelope {
             kind: SymbolKind::Signal,
             type_id: Some(TypeId(3)),
             span: None,
+            native: None,
         }],
         dependencies: Vec::new(),
         native_requirements: Vec::new(),

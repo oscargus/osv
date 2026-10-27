@@ -127,7 +127,10 @@ impl fmt::Display for ArtifactError {
 impl Error for ArtifactError {}
 
 pub(super) fn name(identifier: &Identifier) -> Result<(), ArtifactError> {
-    let (Identifier::Basic(text) | Identifier::Extended(text)) = identifier;
+    let text = match identifier {
+        Identifier::Basic(text) | Identifier::Extended(text) => text,
+        Identifier::Character(_) | Identifier::Operator(_) => return Ok(()),
+    };
     if text.is_empty() || text.chars().any(|character| u32::from(character) > 255) {
         return Err(ArtifactError::InvalidName);
     }
@@ -135,6 +138,15 @@ pub(super) fn name(identifier: &Identifier) -> Result<(), ArtifactError> {
 }
 
 fn identity(identity: &UnitIdentity) -> Result<(), ArtifactError> {
+    if !matches!(
+        identity.library,
+        Identifier::Basic(_) | Identifier::Extended(_)
+    ) || !matches!(
+        identity.primary,
+        Identifier::Basic(_) | Identifier::Extended(_)
+    ) {
+        return Err(ArtifactError::InvalidName);
+    }
     name(&identity.library)?;
     name(&identity.primary)?;
     if let UnitKind::Architecture { name: identifier } = &identity.kind {
@@ -318,18 +330,34 @@ impl ArtifactEnvelope {
                     }
                     checked_types.extend(seen);
                 }
-                TypeDefinition::Scalar(_) => {}
+                TypeDefinition::Scalar(_) | TypeDefinition::Native(_) => {}
             }
         }
         for symbol in &self.symbols {
             name(&symbol.name)?;
+            if matches!(symbol.name, Identifier::Operator(_))
+                && symbol.kind != SymbolKind::Subprogram
+            {
+                return Err(ArtifactError::InvalidSymbol(symbol.id.0));
+            }
+            if matches!(symbol.name, Identifier::Character(_))
+                && symbol.kind != SymbolKind::EnumerationLiteral
+            {
+                return Err(ArtifactError::InvalidSymbol(symbol.id.0));
+            }
             reference(&units, symbol.unit, symbol.unit.0, TableKind::Unit)?;
             reference(&scopes, symbol.scope, symbol.scope.0, TableKind::Scope)?;
             if let Some(type_id) = symbol.type_id {
                 reference(&types, type_id, type_id.0, TableKind::Type)?;
             } else if matches!(
                 symbol.kind,
-                SymbolKind::Type | SymbolKind::Constant | SymbolKind::Signal | SymbolKind::Variable
+                SymbolKind::Type
+                    | SymbolKind::Constant
+                    | SymbolKind::Signal
+                    | SymbolKind::Variable
+                    | SymbolKind::EnumerationLiteral
+                    | SymbolKind::PhysicalUnit
+                    | SymbolKind::Attribute
             ) {
                 return Err(ArtifactError::InvalidSymbol(symbol.id.0));
             }
@@ -369,6 +397,7 @@ impl ArtifactEnvelope {
                 return Err(ArtifactError::NativeRequirement);
             }
         }
+        self.validate_native()?;
         let root = match &self.payload {
             ArtifactPayload::Analysis(analysis) => {
                 let unit = reference(&units, analysis.unit, analysis.unit.0, TableKind::Unit)?;

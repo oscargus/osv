@@ -1,5 +1,5 @@
 ArtifactEnvelope(
-    schema_version: 2,
+    schema_version: 3,
     compiler_compatibility: 1,
     compiler_version: "synthetic fixture",
     language: Vhdl2008,
@@ -29,6 +29,7 @@ ArtifactEnvelope(
         kind: Signal,
         type_id: Some(TypeId(3)),
         span: None,
+        native: None,
     )],
     dependencies: [],
     native_requirements: [],

@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
 
+use crate::intrinsics::{NativeBinding, NativeType, Operator};
 use crate::source::{ByteSpan, SourceFile};
 
-pub const SCHEMA_VERSION: u32 = 2;
+pub const SCHEMA_VERSION: u32 = 3;
 pub const COMPILER_COMPATIBILITY: u32 = 1;
 pub const NATIVE_ABI_VERSION: u32 = 1;
 
@@ -51,6 +52,8 @@ pub struct ContentFingerprint(pub [u8; 32]);
 pub enum Identifier {
     Basic(String),
     Extended(String),
+    Character(u8),
+    Operator(Operator),
 }
 
 impl Identifier {
@@ -58,6 +61,8 @@ impl Identifier {
         match self {
             Self::Basic(name) => Self::Basic(name.to_lowercase()),
             Self::Extended(name) => Self::Extended(name.clone()),
+            Self::Character(character) => Self::Character(*character),
+            Self::Operator(operator) => Self::Operator(*operator),
         }
     }
 }
@@ -119,6 +124,7 @@ pub enum ScalarType {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum TypeDefinition {
+    Native(NativeType),
     Scalar(ScalarType),
     Enumeration { literals: Vec<Identifier> },
     Subtype { base: TypeId },
@@ -140,6 +146,9 @@ pub enum SymbolKind {
     Signal,
     Variable,
     Subprogram,
+    EnumerationLiteral,
+    PhysicalUnit,
+    Attribute,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -152,6 +161,7 @@ pub struct SymbolRecord {
     pub kind: SymbolKind,
     pub type_id: Option<TypeId>,
     pub span: Option<ByteSpan>,
+    pub native: Option<NativeBinding>,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
