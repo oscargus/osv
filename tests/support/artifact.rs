@@ -31,6 +31,18 @@ pub fn sample() -> ArtifactEnvelope {
             parent: None,
             span: None,
         }],
+        scopes: vec![
+            ScopeRecord {
+                id: ScopeId(0),
+                parent: None,
+                kind: ScopeKind::Library(Identifier::Basic("work".into())),
+            },
+            ScopeRecord {
+                id: ScopeId(1),
+                parent: Some(ScopeId(0)),
+                kind: ScopeKind::Unit(UnitId(7)),
+            },
+        ],
         types: vec![TypeRecord {
             id: TypeId(3),
             name: Identifier::Basic("boolean".into()),
@@ -40,6 +52,7 @@ pub fn sample() -> ArtifactEnvelope {
         symbols: vec![SymbolRecord {
             id: SymbolId(5),
             unit: UnitId(7),
+            scope: ScopeId(1),
             name: Identifier::Basic("flag".into()),
             kind: SymbolKind::Signal,
             type_id: Some(TypeId(3)),

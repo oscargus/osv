@@ -2,7 +2,9 @@ use std::{fmt, path::Path};
 
 use crate::{diagnostics::display_path, source::SourceFile};
 
-use super::{ArtifactEnvelope, ArtifactError, ContentFingerprint, SourceRecord, TypeDefinition};
+use super::{
+    ArtifactEnvelope, ArtifactError, ContentFingerprint, ScopeKind, SourceRecord, TypeDefinition,
+};
 
 impl ContentFingerprint {
     pub fn of_bytes(bytes: &[u8]) -> Self {
@@ -41,6 +43,11 @@ impl ArtifactEnvelope {
         for unit in &mut artifact.units {
             unit.identity = unit.identity.normalized();
         }
+        for scope in &mut artifact.scopes {
+            if let ScopeKind::Library(library) = &mut scope.kind {
+                *library = library.normalized();
+            }
+        }
         for record in &mut artifact.types {
             record.name = record.name.normalized();
             if let TypeDefinition::Enumeration { literals } = &mut record.definition {
@@ -61,6 +68,7 @@ impl ArtifactEnvelope {
         }
         artifact.sources.sort_by_key(|source| source.file.id);
         artifact.units.sort_by_key(|unit| unit.id);
+        artifact.scopes.sort_by_key(|scope| scope.id);
         artifact.types.sort_by_key(|record| record.id);
         artifact.symbols.sort_by_key(|symbol| symbol.id);
         artifact.dependencies.sort_by(|left, right| {

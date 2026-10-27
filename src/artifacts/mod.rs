@@ -3,6 +3,7 @@ mod codec;
 mod files;
 mod identity;
 mod model;
+mod scopes;
 pub mod store;
 mod validate;
 
@@ -17,4 +18,5 @@ pub use model::{
     SourceRecord, SymbolId, SymbolKind, SymbolRecord, TypeDefinition, TypeId, TypeRecord, UnitId,
     UnitIdentity, UnitKind, UnitRecord,
 };
+pub use model::{ScopeId, ScopeKind, ScopeRecord};
 pub use validate::{ArtifactError, TableKind};

@@ -9,7 +9,7 @@ commands and library catalogs belong to `009` and `010`.
 
 ## Envelope and References
 
-`ArtifactEnvelope` carries schema version `1`, compiler compatibility epoch
+`ArtifactEnvelope` carries schema version `2`, compiler compatibility epoch
 `1`, a diagnostic compiler-version string, the sole `Vhdl2008` revision,
 logical unit identity, source/unit/type/symbol tables, exact dependencies,
 native declaration-set fingerprints and ABI requirements, and a typed payload.
@@ -17,7 +17,7 @@ Its stage is derived from `ArtifactPayload::Analysis` or `Elaboration`, never
 an independently mutable string or tag. `validate(expected_stage)` checks
 compatibility and structure without invoking any compiler stage.
 
-`UnitId`, `TypeId`, `SymbolId`, and the existing `SourceId` are distinct fixed
+`UnitId`, `TypeId`, `SymbolId`, `ScopeId`, and the existing `SourceId` are distinct fixed
 `u32` identities local to their artifact tables. They are references, not array
 indices, paths, or host addresses. Owners must allocate them deterministically
 and retain them across persistence; canonicalization never silently renumbers
@@ -50,6 +50,25 @@ IDs. The elaboration payload selects a root entity and its actual architecture.
 Future chunks extend these records deliberately with typed expressions,
 layouts, continuations, and operations. These initial synthetic artifacts are
 not executable designs and cannot be simulated by the bootstrap CLI.
+
+## Lexical Scopes
+
+Chunk `016a` adds owned `ScopeRecord` data with typed `ScopeId` references and
+`ScopeKind::{Library, Unit, Lexical}`. Each unit has exactly one unit scope;
+primary units parent to the matching library scope, and secondary units to
+their primary's scope. Nested lexical scopes retain an owning unit and parent
+within that same unit. Symbols retain both declaration unit and lexical scope.
+Validation rejects duplicate/dangling scope IDs, missing/duplicate unit scopes,
+wrong library or symbol ownership, invalid parents, and cycles. Traversal is
+iterative with completed-path reuse; sparse IDs remain unchanged on reload.
+
+Scope records are canonicalized by typed ID, library names are normalized,
+and scope data participates in logical identity. These fields are incompatible
+with the original schema `1`, which is deliberately rejected rather than
+silently migrated or filled with guessed default scopes. Compiler epoch and
+native ABI remain `1`. This is persistence/validation only: name lookup and
+syntax registration remain in ordered child `016b`, with the parent `016`
+unchecked until that work and its checks finish.
 
 ## Source Fidelity
 

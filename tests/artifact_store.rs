@@ -80,6 +80,11 @@ fn secondary(primary: &ArtifactEnvelope, kind: UnitKind, marker: &str) -> Artifa
         parent: Some(UnitId(7)),
         span: None,
     });
+    artifact.scopes.push(ScopeRecord {
+        id: ScopeId(2),
+        parent: Some(ScopeId(1)),
+        kind: ScopeKind::Unit(UnitId(8)),
+    });
     artifact.symbols.clear();
     artifact.types.clear();
     artifact.payload = ArtifactPayload::Analysis(AnalysisArtifact {
@@ -229,6 +234,7 @@ fn artifact_store_cross_library_dependencies_resolve_without_sources() {
     let directory = tempfile::tempdir().unwrap();
     let mut other = named("definitions", UnitKind::Package);
     other.identity.library = Identifier::Basic("other".into());
+    other.scopes[0].kind = ScopeKind::Library(other.identity.library.clone());
     other.units[0].identity = other.identity.clone();
     let mut other_store = LibraryStore::open(
         directory.path(),

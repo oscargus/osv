@@ -28,6 +28,7 @@ fn artifact_duplicate_ids_and_dangling_references_are_rejected() {
         TableKind::Unit,
         TableKind::Type,
         TableKind::Symbol,
+        TableKind::Scope,
     ] {
         let mut artifact = sample();
         match table {
@@ -35,6 +36,7 @@ fn artifact_duplicate_ids_and_dangling_references_are_rejected() {
             TableKind::Unit => artifact.units.push(artifact.units[0].clone()),
             TableKind::Type => artifact.types.push(artifact.types[0].clone()),
             TableKind::Symbol => artifact.symbols.push(artifact.symbols[0].clone()),
+            TableKind::Scope => artifact.scopes.push(artifact.scopes[0].clone()),
         }
         assert!(
             matches!(artifact.validate(artifact.stage()), Err(ArtifactError::DuplicateId { table: actual, .. }) if actual == table)
@@ -90,6 +92,11 @@ fn artifact_elaboration_has_a_concrete_root_and_secondary_architecture() {
     };
     architecture.parent = Some(UnitId(7));
     artifact.units.push(architecture);
+    artifact.scopes.push(ScopeRecord {
+        id: ScopeId(2),
+        parent: Some(ScopeId(1)),
+        kind: ScopeKind::Unit(UnitId(8)),
+    });
     artifact.payload = ArtifactPayload::Elaboration(ElaborationArtifact {
         root: UnitId(7),
         architecture: UnitId(8),
@@ -148,6 +155,11 @@ fn artifact_all_set_like_tables_have_canonical_order() {
     unit.id = UnitId(70);
     unit.identity.primary = Identifier::Basic("another".into());
     artifact.units.push(unit);
+    artifact.scopes.push(ScopeRecord {
+        id: ScopeId(2),
+        parent: Some(ScopeId(0)),
+        kind: ScopeKind::Unit(UnitId(70)),
+    });
     let mut record = artifact.types[0].clone();
     record.id = TypeId(30);
     record.name = Identifier::Basic("another".into());
@@ -169,6 +181,7 @@ fn artifact_all_set_like_tables_have_canonical_order() {
     let fingerprint = artifact.fingerprint().unwrap();
     artifact.sources.reverse();
     artifact.units.reverse();
+    artifact.scopes.reverse();
     artifact.types.reverse();
     artifact.symbols.reverse();
     artifact.dependencies.reverse();
@@ -186,6 +199,7 @@ fn artifact_all_reference_tables_are_checked() {
         TableKind::Unit,
         TableKind::Type,
         TableKind::Symbol,
+        TableKind::Scope,
     ] {
         let mut artifact = sample();
         match table {
@@ -199,6 +213,7 @@ fn artifact_all_reference_tables_are_checked() {
             TableKind::Unit => artifact.symbols[0].unit = UnitId(99),
             TableKind::Type => artifact.symbols[0].type_id = Some(TypeId(99)),
             TableKind::Symbol => artifact.types[0].declaration = Some(SymbolId(99)),
+            TableKind::Scope => artifact.symbols[0].scope = ScopeId(99),
         }
         assert_eq!(
             artifact.validate(artifact.stage()),
@@ -253,6 +268,11 @@ fn artifact_secondary_units_require_exact_primary_links() {
     architecture.parent = Some(UnitId(7));
     artifact.identity = architecture.identity.clone();
     artifact.units.push(architecture);
+    artifact.scopes.push(ScopeRecord {
+        id: ScopeId(2),
+        parent: Some(ScopeId(1)),
+        kind: ScopeKind::Unit(UnitId(8)),
+    });
     artifact.payload = ArtifactPayload::Analysis(AnalysisArtifact {
         unit: UnitId(8),
         declarations: Vec::new(),

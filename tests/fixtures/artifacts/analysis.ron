@@ -1,5 +1,5 @@
 ArtifactEnvelope(
-    schema_version: 1,
+    schema_version: 2,
     compiler_compatibility: 1,
     compiler_version: "synthetic fixture",
     language: Vhdl2008,
@@ -17,9 +17,14 @@ ArtifactEnvelope(
         declaration: None,
         definition: Scalar(Boolean),
     )],
+    scopes: [
+        (id: ScopeId(0), parent: None, kind: Library(Basic("work"))),
+        (id: ScopeId(1), parent: Some(ScopeId(0)), kind: Unit(UnitId(7))),
+    ],
     symbols: [(
         id: SymbolId(5),
         unit: UnitId(7),
+        scope: ScopeId(1),
         name: Basic("flag"),
         kind: Signal,
         type_id: Some(TypeId(3)),

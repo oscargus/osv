@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::source::{ByteSpan, SourceFile};
 
-pub const SCHEMA_VERSION: u32 = 1;
+pub const SCHEMA_VERSION: u32 = 2;
 pub const COMPILER_COMPATIBILITY: u32 = 1;
 pub const NATIVE_ABI_VERSION: u32 = 1;
 
@@ -25,6 +25,24 @@ pub struct TypeId(pub u32);
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct SymbolId(pub u32);
+
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub struct ScopeId(pub u32);
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub enum ScopeKind {
+    Library(Identifier),
+    Unit(UnitId),
+    Lexical(UnitId),
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct ScopeRecord {
+    pub id: ScopeId,
+    pub parent: Option<ScopeId>,
+    pub kind: ScopeKind,
+}
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct ContentFingerprint(pub [u8; 32]);
@@ -129,6 +147,7 @@ pub enum SymbolKind {
 pub struct SymbolRecord {
     pub id: SymbolId,
     pub unit: UnitId,
+    pub scope: ScopeId,
     pub name: Identifier,
     pub kind: SymbolKind,
     pub type_id: Option<TypeId>,
@@ -192,6 +211,7 @@ pub struct ArtifactEnvelope {
     pub identity: UnitIdentity,
     pub sources: Vec<SourceRecord>,
     pub units: Vec<UnitRecord>,
+    pub scopes: Vec<ScopeRecord>,
     pub types: Vec<TypeRecord>,
     pub symbols: Vec<SymbolRecord>,
     pub dependencies: Vec<DependencyRecord>,

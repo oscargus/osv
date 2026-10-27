@@ -4,6 +4,7 @@ use std::{
     fmt,
 };
 
+use super::ScopeId;
 use crate::source::{ByteSpan, SourceId};
 
 use super::{
@@ -18,6 +19,7 @@ pub enum TableKind {
     Unit,
     Type,
     Symbol,
+    Scope,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -38,6 +40,8 @@ pub enum ArtifactError {
     },
     DuplicateIdentity(UnitIdentity),
     InvalidUnit(UnitId),
+    InvalidScope(ScopeId),
+    MissingUnitScope(UnitId),
     IdentityMismatch,
     InvalidName,
     InvalidType(u32),
@@ -107,6 +111,12 @@ impl fmt::Display for ArtifactError {
             Self::NativeRequirement => {
                 formatter.write_str("duplicate or incompatible native-library requirement")
             }
+            Self::InvalidScope(id) => {
+                write!(formatter, "invalid lexical scope or parent for ID {}", id.0)
+            }
+            Self::MissingUnitScope(id) => {
+                write!(formatter, "unit {} has no unique persisted scope", id.0)
+            }
             Self::Encoding(message) => {
                 write!(formatter, "cannot encode canonical artifact: {message}")
             }
@@ -116,7 +126,7 @@ impl fmt::Display for ArtifactError {
 
 impl Error for ArtifactError {}
 
-fn name(identifier: &Identifier) -> Result<(), ArtifactError> {
+pub(super) fn name(identifier: &Identifier) -> Result<(), ArtifactError> {
     let (Identifier::Basic(text) | Identifier::Extended(text)) = identifier;
     if text.is_empty() || text.chars().any(|character| u32::from(character) > 255) {
         return Err(ArtifactError::InvalidName);
@@ -176,6 +186,10 @@ impl ArtifactEnvelope {
             TableKind::Source,
         )?;
         unique(self.units.iter().map(|record| record.id.0), TableKind::Unit)?;
+        unique(
+            self.scopes.iter().map(|record| record.id.0),
+            TableKind::Scope,
+        )?;
         unique(self.types.iter().map(|record| record.id.0), TableKind::Type)?;
         unique(
             self.symbols.iter().map(|record| record.id.0),
@@ -201,6 +215,16 @@ impl ArtifactEnvelope {
             .iter()
             .map(|record| (record.id, record))
             .collect::<BTreeMap<_, _>>();
+        let scopes = self
+            .scopes
+            .iter()
+            .map(|record| (record.id, record))
+            .collect::<BTreeMap<_, _>>();
+        for scope in &self.scopes {
+            if let Some(parent) = scope.parent {
+                reference(&scopes, parent, parent.0, TableKind::Scope)?;
+            }
+        }
         let span = |location: Option<ByteSpan>| -> Result<(), ArtifactError> {
             if let Some(location) = location {
                 let source = reference(
@@ -257,6 +281,7 @@ impl ArtifactEnvelope {
                 _ => return Err(ArtifactError::InvalidUnit(unit.id)),
             }
         }
+        self.validate_scopes()?;
         let mut checked_types = BTreeSet::new();
         for record in &self.types {
             name(&record.name)?;
@@ -299,6 +324,7 @@ impl ArtifactEnvelope {
         for symbol in &self.symbols {
             name(&symbol.name)?;
             reference(&units, symbol.unit, symbol.unit.0, TableKind::Unit)?;
+            reference(&scopes, symbol.scope, symbol.scope.0, TableKind::Scope)?;
             if let Some(type_id) = symbol.type_id {
                 reference(&types, type_id, type_id.0, TableKind::Type)?;
             } else if matches!(

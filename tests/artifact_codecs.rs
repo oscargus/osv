@@ -19,6 +19,11 @@ fn sample(stage: ArtifactStage) -> ArtifactEnvelope {
         };
         architecture.parent = Some(UnitId(7));
         artifact.units.push(architecture);
+        artifact.scopes.push(ScopeRecord {
+            id: ScopeId(2),
+            parent: Some(ScopeId(1)),
+            kind: ScopeKind::Unit(UnitId(8)),
+        });
         artifact.payload = ArtifactPayload::Elaboration(ElaborationArtifact {
             root: UnitId(7),
             architecture: UnitId(8),
@@ -173,7 +178,10 @@ fn artifact_codec_truncation_trailing_data_and_invalid_fields_fail() {
         ron[..ron.len() / 2].to_string(),
         format!("{ron}\ntrailing"),
         ron.replace("Vhdl2008", "Vhdl2019"),
-        ron.replace("schema_version: 1", "schema_version: 999"),
+        ron.replace(
+            &format!("schema_version: {SCHEMA_VERSION}"),
+            "schema_version: 999",
+        ),
         ron.replace("compiler_version:", "unknown_field:"),
         ron.replace("display_name:", "unexpected: 0, display_name:"),
     ] {

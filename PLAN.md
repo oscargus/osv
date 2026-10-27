@@ -301,6 +301,23 @@ Waveform generation is optional and is separate from artifact serialization: VCD
 - **Done When:** Names resolve to declaration identities rather than strings scattered through later passes.
 - **Do Not:** Pretend all `use`, overload, context, or package visibility rules are complete before their later chunks.
 
+This chunk has ordered children because persisted scope identity and syntax-driven
+declaration registration are separate contracts. Complete both before `017`.
+
+#### [x] 016a - Persist Owned Lexical Scopes
+
+- **Work:** Add typed scope IDs, library/unit/nested scope records and symbol ownership to the shared artifact model. Validate parent/reference graphs and canonical ordering. Bump the incompatible schema deliberately; do not silently migrate the earlier synthetic envelope.
+- **Checks:** Reject duplicate/dangling scope IDs, scope cycles, invalid unit/library ownership, and wrong symbol scope. Preserve scope and symbol IDs across binary/RON conversion; rerun affected artifact/store/CLI tests and required Rust gates.
+- **Done When:** Owned lexical scope identity survives validated artifact reload independently of parser nodes or host lookup caches.
+
+**Handoff (2026-10-27):** Complete. See [docs/artifact-model.md](docs/artifact-model.md), [src/artifacts/scopes.rs](src/artifacts/scopes.rs), and [tests/artifact_scopes.rs](tests/artifact_scopes.rs). Added typed `ScopeId`, library/unit/lexical scope records, and explicit `SymbolRecord::scope` ownership; scope tables and normalized library names participate in canonical identity. Validation rejects duplicates, dangling references, cycles, wrong parents/libraries/owners, and missing/duplicate unit scopes. The incompatible artifact schema is deliberately `2`; compiler/native epochs remain `1`, and older schema data is rejected without implicit migration. Synthetic builders/fixtures and affected artifact/codec/store/command checks now retain proper scope relationships. The first missing-symbol-scope check passed immediately after the small edit. Five scoped-model tests cover references/cycles/ownership, sparse IDs, canonical order/case, both-codec symbol identity, and old-schema rejection. Root formatting/check/strict Clippy/all-target tests pass (121 total); all 42 then-affected artifact tests passed before the final two boundaries were added. No dependencies, parser node persistence, actual name registration/lookup, standard declarations, or semantic stage was introduced. No blockers; parent `016` remains unchecked until `016b` implements its VHDL-driven name rules and checks.
+
+#### [ ] 016b - Register Units and Resolve Initial Names
+
+- **Work:** Consume local syntax views to register primary/secondary units, libraries, lexical declarations, basic/extended identifiers, and initial `work`/`std` visibility. Preserve the `016a` scope model and emit source-linked errors for duplicate/missing/wrong parents and unresolved forward prerequisites. Keep full imports/overloads/context visibility explicitly deferred.
+- **Checks:** Use VHDL fixtures for duplicate/case/extended-name behavior, secondary associations, missing units, forward dependency errors, lexical shadowing, and stable lookup identity after artifact reload. Run required Rust gates.
+- **Done When:** Initial names resolve to persisted declaration identities without claiming later visibility or expression semantics.
+
 ### [ ] 017 - Bootstrap `std.standard` and Intrinsic Identity
 
 - **Work:** Install trusted builtin declarations for the initial scalar/time types, basic operations, severity, and reporting needs. Create a versioned intrinsic registry keyed by canonical declaration/signature, with metadata for purity, argument/result types, and specialization requirements.
