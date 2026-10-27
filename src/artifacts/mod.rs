@@ -1,5 +1,6 @@
 mod bounded;
 mod codec;
+mod files;
 mod identity;
 mod model;
 mod validate;
@@ -7,6 +8,7 @@ mod validate;
 pub use codec::{
     ArtifactFormat, CodecError, DecodeLimits, ResourceLimit, decode, encode, read_from,
 };
+pub use files::{load, publish_new};
 pub use model::{
     AnalysisArtifact, ArtifactEnvelope, ArtifactPayload, ArtifactStage, COMPILER_COMPATIBILITY,
     ContentFingerprint, DependencyRecord, DependencyRole, ElaborationArtifact, Identifier,

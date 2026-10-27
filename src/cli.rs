@@ -1,11 +1,15 @@
-use std::{ffi::OsString, io, io::Write};
+mod artifact;
 
-use clap::{Args, CommandFactory, Parser, Subcommand};
+use std::{ffi::OsString, io, io::Write, path::PathBuf};
+
+use clap::{Args, CommandFactory, Parser, Subcommand, ValueEnum};
+
+use crate::artifacts::ArtifactFormat;
 
 #[derive(Parser)]
 #[command(
     name = "osv",
-    about = "VHDL 2008 simulator bootstrap (commands not implemented yet)",
+    about = "VHDL 2008 simulator and artifact tools (stages not implemented yet)",
     version = concat!(env!("CARGO_PKG_VERSION"), " (bootstrap)"),
 )]
 struct Cli {
@@ -21,7 +25,7 @@ enum StageCommand {
     Elaborate(PendingArguments),
     #[command(about = "Simulate an elaborated artifact (not implemented yet)")]
     Simulate(PendingArguments),
-    #[command(about = "Inspect or convert artifacts (not implemented yet)")]
+    #[command(about = "Inspect or convert binary and RON artifacts")]
     Artifact(ArtifactArguments),
 }
 
@@ -38,15 +42,44 @@ struct PendingArguments {
 #[derive(Args)]
 struct ArtifactArguments {
     #[command(subcommand)]
-    command: Option<ArtifactCommand>,
+    command: ArtifactCommand,
 }
 
 #[derive(Subcommand)]
 enum ArtifactCommand {
-    #[command(about = "Inspect an artifact as readable RON (not implemented yet)")]
-    Inspect(PendingArguments),
-    #[command(about = "Convert binary and RON artifacts (not implemented yet)")]
-    Convert(PendingArguments),
+    #[command(about = "Inspect an artifact as readable RON")]
+    Inspect(InspectArguments),
+    #[command(about = "Convert binary and RON artifacts without reanalysis")]
+    Convert(ConvertArguments),
+}
+
+#[derive(Args)]
+struct InspectArguments {
+    input: PathBuf,
+}
+
+#[derive(Clone, Copy, ValueEnum)]
+enum OutputFormat {
+    Binary,
+    Ron,
+}
+
+impl From<OutputFormat> for ArtifactFormat {
+    fn from(format: OutputFormat) -> Self {
+        match format {
+            OutputFormat::Binary => Self::Binary,
+            OutputFormat::Ron => Self::Ron,
+        }
+    }
+}
+
+#[derive(Args)]
+struct ConvertArguments {
+    input: PathBuf,
+    #[arg(long, value_enum)]
+    to: OutputFormat,
+    #[arg(long)]
+    output: PathBuf,
 }
 
 pub fn run(
@@ -71,9 +104,17 @@ pub fn run(
         Some(StageCommand::Elaborate(_)) => "elaborate",
         Some(StageCommand::Simulate(_)) => "simulate",
         Some(StageCommand::Artifact(arguments)) => match arguments.command {
-            Some(ArtifactCommand::Inspect(_)) => "artifact inspect",
-            Some(ArtifactCommand::Convert(_)) => "artifact convert",
-            None => "artifact",
+            ArtifactCommand::Inspect(arguments) => {
+                return artifact::inspect(&arguments.input, output, errors);
+            }
+            ArtifactCommand::Convert(arguments) => {
+                return artifact::convert(
+                    &arguments.input,
+                    &arguments.output,
+                    arguments.to.into(),
+                    errors,
+                );
+            }
         },
         None => {
             Cli::command().write_long_help(output)?;

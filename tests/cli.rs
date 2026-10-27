@@ -32,9 +32,6 @@ fn bootstrap_stage_commands_are_explicit_errors() {
         &["analyze", "not-a-source.vhd"][..],
         &["elaborate", "work.top"][..],
         &["simulate", "not-an-artifact.osve"][..],
-        &["artifact"][..],
-        &["artifact", "inspect", "not-an-artifact.osve"][..],
-        &["artifact", "convert", "not-an-artifact.osve"][..],
         &["analyze", "--library", "work", "not-a-source.vhd"][..],
     ] {
         let output = run(arguments);
@@ -59,16 +56,6 @@ fn bootstrap_artifact_format_options_remain_explicit_errors() {
                 "elaborate",
                 vec!["elaborate", "work.top", "--artifact-format", format],
             ),
-            (
-                "artifact convert",
-                vec![
-                    "artifact",
-                    "convert",
-                    "not-an-artifact.osve",
-                    "--to",
-                    format,
-                ],
-            ),
         ] {
             let output = run(&arguments);
             assert_eq!(output.status.code(), Some(2));
@@ -89,6 +76,8 @@ fn bootstrap_unknown_commands_and_options_fail() {
         &["unknown"][..],
         &["--unknown"][..],
         &["artifact", "unknown"][..],
+        &["artifact"][..],
+        &["artifact", "convert", "not-an-artifact.osve"][..],
     ] {
         let output = run(arguments);
         assert_eq!(output.status.code(), Some(2));
@@ -117,7 +106,9 @@ fn bootstrap_clap_subcommand_help_is_available() {
         assert!(output.stderr.is_empty());
         let help = String::from_utf8(output.stdout).unwrap();
         assert!(help.contains("Usage:"), "{help}");
-        assert!(help.contains("not implemented yet"), "{help}");
+        if ["analyze", "elaborate", "simulate"].contains(&arguments[0]) {
+            assert!(help.contains("not implemented yet"), "{help}");
+        }
         assert!(!help.contains('\x1b'));
         if arguments == ["artifact", "--help"] {
             assert!(help.contains("inspect"), "{help}");
@@ -137,6 +128,16 @@ fn bootstrap_clap_help_and_version_follow_display_precedence() {
         assert!(!output.stdout.is_empty());
         assert!(output.stderr.is_empty());
     }
+}
+
+#[test]
+fn artifact_inspect_missing_input_reports_artifact_error() {
+    let output = run(&["artifact", "inspect", "not-an-artifact.osve"]);
+    assert_eq!(output.status.code(), Some(1));
+    assert!(output.stdout.is_empty());
+    let error = String::from_utf8(output.stderr).unwrap();
+    assert!(error.contains("OSV-ARTIFACT-IO"), "{error}");
+    assert!(error.contains("not-an-artifact.osve"), "{error}");
 }
 
 #[test]

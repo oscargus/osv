@@ -13,6 +13,7 @@ clap = { version = "4.6", default-features = false, features = ["std", "derive",
 postcard = { version = "1.1", default-features = false, features = ["alloc"] }
 ron = "0.12"
 serde = { version = "1", features = ["derive"] }
+tempfile = "3"
 vhdl_syntax = { git = "https://github.com/VHDL-LS/rust_hdl.git", rev = "dc8c090f7aeb9a95149eadc5e8b48f170382a8d4" }
 
 [workspace]
