@@ -327,6 +327,23 @@ declaration registration are separate contracts. Complete both before `017`.
 - **Done When:** Analysis, elaboration, and runtime share one body-free builtin identity contract.
 - **Do Not:** Substitute functions using only an unqualified name or assume every standard function is pure/foldable.
 
+Complete these ordered children before `018`; the initial exact-identity probe
+belongs to `017a`, and no prelude installation has started yet.
+
+#### [x] 017a - Define Versioned Native Declaration Identity
+
+- **Work:** Define canonical initial standard type/declaration profiles, stable intrinsic IDs/references, purity/effect and specialization metadata, and exact package/declaration-set/ABI matching. Keep runtime bindings outside serialized data.
+- **Checks:** Round-trip references in both codecs; reject user homonyms, changed signatures, stale declaration fingerprints/ABIs, and incorrect intrinsic IDs; distinguish pure operations from reporting/time effects. Run required Rust gates.
+- **Done When:** Later stages can validate one owned body-free intrinsic identity contract without spelling-only replacement.
+
+**Handoff (2026-10-27):** Complete. See [docs/intrinsic-identity.md](docs/intrinsic-identity.md) and [src/intrinsics/mod.rs](src/intrinsics/mod.rs). Added typed standard type/attribute profiles and selected operator/function/statement signatures, stable `IntrinsicId`/`IntrinsicReference`, complete `DeclarationIdentity`, and registry-profile/ABI/declaration-set matching. Native manifest fingerprints include type constraints/literals/units and operation metadata; user packages, changed signatures, stale fingerprints/ABIs, and wrong IDs are rejected. Purity, effects, folding eligibility, and specialization are explicit; report/assert/time observation never fold. Character/control/time profiles were checked against pinned declaration sources; integer/time/real limits preserve chunk `003` decisions. The first exact native-vs-user identity test passed immediately after the small edit. Six tests cover all reference/type-profile binary/RON conversions, user homonyms, stale/mismatched identities, effects, canonical case, and profile boundaries. Root formatting/check/strict Clippy/all-target tests pass (136 total). No dependencies, artifact schema, prelude installation, host/function pointer persistence, executing kernel, package body, or complete standard-library coverage was introduced. No blockers; parent `017` remains unchecked until `017b` installs these trusted declarations into owned scopes/types/symbols and verifies source/body-free lookup.
+
+#### [ ] 017b - Install Trusted Standard Prelude
+
+- **Work:** Install the initial trusted scalar/time/severity/reporting declarations in owned scopes/types/symbols, preserving existing identities and the `017a` registry. Add explicit schema changes if builtin type references require them. Keep unimplemented standard operation families visible as later inventory owners.
+- **Checks:** Resolve initial standard names/operators without source/package bodies, reject accidental user substitution, preserve references/lookup across binary/RON artifacts, and run required Rust gates.
+- **Done When:** Analysis, elaboration, and runtime have a shared trusted prelude and exact intrinsic references; no complete-library claim is made for deferred families.
+
 ### [ ] 018 - Type Initial Scalar Expressions
 
 - **Work:** Analyze boolean/integer/time literals and names, selected initial builtin operators, expected types, and locally static expressions. Attach types/spans and perform safe constant folding with explicit not-yet-static results.
