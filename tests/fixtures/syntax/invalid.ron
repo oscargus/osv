@@ -1,0 +1,11 @@
+(
+    kind: ParserProbe,
+    sources: ["vhdl/incomplete-entity.vhd"],
+    expected: (
+        stage: Analysis,
+        diagnostics: [(stage: Analysis, code: Syntax, severity: Error)],
+        exit_status: 1,
+        result: (parsed: false, design_units: 0),
+        output: "expected EntityDeclarationEpilogue",
+    ),
+)

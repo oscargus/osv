@@ -52,6 +52,9 @@ pub enum DiagnosticCode {
     ArtifactCompatibility,
     ArtifactValidation,
     ArtifactIo,
+    SourceUnavailable,
+    SourceTooLarge,
+    PslUnsupported,
 }
 
 impl fmt::Display for DiagnosticCode {
@@ -67,6 +70,9 @@ impl fmt::Display for DiagnosticCode {
             Self::ArtifactCompatibility => "OSV-ARTIFACT-COMPATIBILITY",
             Self::ArtifactValidation => "OSV-ARTIFACT-VALIDATION",
             Self::ArtifactIo => "OSV-ARTIFACT-IO",
+            Self::SourceUnavailable => "OSV-SOURCE-UNAVAILABLE",
+            Self::SourceTooLarge => "OSV-SOURCE-TOO-LARGE",
+            Self::PslUnsupported => "OSV-PSL-UNSUPPORTED",
         })
     }
 }

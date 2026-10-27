@@ -57,9 +57,10 @@ by chunks `007`/`008`/`121`.
   calls, with optional source locations. No recursive rendering logic belongs
   in semantic code.
 
-Codes currently identify syntax/type mismatches and the existing CLI error-code
-spellings. Later features add their own typed variants. Diagnostic advice and
-warnings are nonfatal; these severities are not VHDL `severity_level` values.
+Codes identify syntax/type mismatches, CLI errors, artifact input/compatibility
+failures, unavailable/oversized sources, and the explicit PSL parser gap.
+Later features append their own typed variants. Diagnostic advice and warnings
+are nonfatal; these severities are not VHDL `severity_level` values.
 
 | Diagnostic Result | Exit Status |
 | --- | --- |

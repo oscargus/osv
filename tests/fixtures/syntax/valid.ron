@@ -1,0 +1,11 @@
+(
+    kind: ParserProbe,
+    sources: ["vhdl/syntax-mixed.vhd"],
+    expected: (
+        stage: Analysis,
+        diagnostics: [],
+        exit_status: 0,
+        result: (parsed: true, design_units: 3),
+        output: "",
+    ),
+)

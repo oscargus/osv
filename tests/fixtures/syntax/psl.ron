@@ -1,0 +1,11 @@
+(
+    kind: ParserProbe,
+    sources: ["vhdl/syntax-psl.vhd"],
+    expected: (
+        stage: Analysis,
+        diagnostics: [(stage: Analysis, code: PslUnsupported, severity: Error)],
+        exit_status: 1,
+        result: (parsed: false, design_units: 0),
+        output: "embedded PSL is not supported by the pinned parser",
+    ),
+)

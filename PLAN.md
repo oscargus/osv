@@ -2,7 +2,7 @@
 
 This is an execution plan for the simulator described in [project.md](project.md), including the additional requirement that artifacts use binary serialization by default and also support inspectable RON serialization.
 
-Chunks `001`-`014` are complete, covering the foundation, artifact tools/store, primitive values/time, array bounds/index mapping, and packed/lossless nine-state vectors. Chunk `004` has passing hosted checks on Linux x86-64/ARM64, Windows, and macOS. Production VHDL analysis, elaboration, and simulation are not implemented; checked chunks and their handoffs record verified progress.
+Chunks `001`-`015` are complete, covering the foundation, artifact tools/store, primitive values/time, array bounds/index mapping, packed/lossless nine-state vectors, and the syntax adapter. Chunk `004` has passing hosted checks on Linux x86-64/ARM64, Windows, and macOS. Production VHDL analysis, elaboration, and simulation are not implemented; checked chunks and their handoffs record verified progress.
 
 ## How to Run This Plan
 
@@ -285,12 +285,14 @@ Waveform generation is optional and is separate from artifact serialization: VCD
 
 **Handoff (2026-10-27):** Complete. See [docs/logic-vectors.md](docs/logic-vectors.md) and [src/values/logic.rs](src/values/logic.rs). Added all nine typed states and `LogicVector` with packed binary or four-bit-per-state fallback, immutable storage inspection, checked logical/storage access, lossless promotion, exact-binary-only repacking, and storage-position slice copies. `L`/`H` remain weak states, never storage-level `0`/`1`. Equality is representation-independent; both codecs emit canonical binary values or readable named state lists and reject unknown states. Fallible fallback allocation shares the packed width cap; artifact collection budgets remain explicit. The first all-nine-state packability check passed immediately after the small edit. Six tests cover compactness, small/big boundaries, promotion/restoration, weak/unknown/high-impedance retention, null/slice/index/direction boundaries, named RON fixtures, and randomized state/reference/codec parity. Root formatting/check/strict Clippy/all-target tests pass (109 total); editor diagnostics are clean. No dependencies or envelope schema changed; no resolution/numeric policy, full VHDL slice semantics, native package body, or runtime stage was introduced. No blockers; `015` should now wrap the pinned parser through shared Latin-1 sources/diagnostics without implementing semantic rules.
 
-### [ ] 015 - Wrap the Parser Behind a Syntax Adapter
+### [x] 015 - Wrap the Parser Behind a Syntax Adapter
 
 - **Work:** Integrate the verified parser API with source management. Expose the syntax and spans needed by initial analysis through a local adapter; centralize parser-version assumptions and VHDL revision configuration.
 - **Checks:** Parse entities, architectures, packages, expressions, and invalid input; preserve source locations; reject known 2019-only constructs under the chosen parser configuration.
 - **Done When:** Semantic code consumes a tested local boundary and parser diagnostics use the shared renderer.
 - **Do Not:** Implement semantic rules in the adapter or duplicate an existing useful parser facility without cause.
+
+**Handoff (2026-10-27):** Complete. See [docs/syntax-adapter.md](docs/syntax-adapter.md) and [src/syntax.rs](src/syntax.rs). `parse(&SourceFile)` uses raw Latin-1 bytes and explicit VHDL 2008 selection, returning local nonserializable `ParsedSource`/node/token views with retained source IDs, checked spans, lossless output, and delegated traversal. Pinned node/token kinds are centrally reexported, not recreated. Parser errors map structured spans/kinds directly to shared diagnostics; missing/oversized source and PSL codes are appended. Actual token trivia detects `-- psl` directives with source-linked `L067`/`lang.psl` errors instead of ignored assertions; strings/ordinary comments are not misclassified. The first Latin-1/CRLF error-span check passed immediately after the small edit. Seven tests cover real entity/architecture/package/expression/context/process(all) fixtures, all node/token spans, lossless bytes, invalid input/rendering/fallback, known 2019 rejection, explicit PSL gaps, and parse acceptance of later semantic errors. The test's guessed generic expression kind was corrected to verified concrete kinds; rare span error values were boxed for Clippy and gates rerun. Root formatting/check/strict Clippy/all-target tests pass (116 total). No dependencies/parser pin, artifact schema, semantic analysis, package body, CLI stage, or later feature changed. D04 package-interface exclusions remain semantic prelude/I/O obligations, not spelling-based syntax rejection. No blockers; `016` must consume these views and add actual declaration/name/visibility rules separately.
 
 ### [ ] 016 - Build Library Scopes and Unit Declarations
 
