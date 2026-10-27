@@ -4,10 +4,12 @@ Plan chunk `001`, verified on 2026-10-27. The isolated probe verifies a parser i
 
 ## Dependency and Toolchain
 
-Use the upstream `master` branch, as requested, rather than the published crates.io release:
+Use an explicit commit resolved from upstream `master`, as requested, rather
+than the published crates.io release. The latest commit was rechecked on
+2026-10-27 and is unchanged from the original probe:
 
 ```toml
-vhdl_syntax = { git = "https://github.com/VHDL-LS/rust_hdl.git", branch = "master" }
+vhdl_syntax = { git = "https://github.com/VHDL-LS/rust_hdl.git", rev = "dc8c090f7aeb9a95149eadc5e8b48f170382a8d4" }
 ```
 
 The probe manifest is [../probes/parser/Cargo.toml](../probes/parser/Cargo.toml). Its [../probes/parser/Cargo.lock](../probes/parser/Cargo.lock) resolves the branch to:
@@ -23,7 +25,12 @@ dc8c090f7aeb9a95149eadc5e8b48f170382a8d4
 - Parser license: MPL-2.0, confirmed in the repository license notice and parser source headers.
 - Optional parser Serde support is not enabled. OSV's artifact model must remain independent of parser implementation types.
 
-Retain the lockfile and use `--locked` for ordinary validation. Changing the upstream branch tip must be an explicit dependency update followed by these tests; it must not happen silently during normal builds. When bootstrapping the real package, retain the Git dependency and deliberately preserve or review its resolved revision.
+Both root and probe manifests now select that `rev` explicitly. Retain the
+lockfiles and use `--locked` for ordinary validation. Updating to a newer
+`master` commit requires changing both manifests and deliberately refreshing
+both lockfiles, then rerunning the parser/decision probes and declaration audit;
+it must not happen silently during normal builds. Registry dependencies use
+ordinary compatible version ranges instead of exact version pins.
 
 ## Verified Parser Boundary
 

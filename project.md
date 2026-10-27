@@ -19,6 +19,8 @@ Simulation should take an elaborated entity and run the simulation.
 
 Simulation should optionally generate VCD and FST waveform files, individually or together. FST output must use the `fst_writer` library (Cargo package `fst-writer`); VCD output should use an established writer where suitable and also support de-facto extensions for e.g. strings, enums, and type names. Waveforms should include selected hierarchical signals (all by default), initial values, changes, and a timescale matching simulation resolution. Format-specific logic-state and delta-cycle limitations must be documented without changing simulation semantics.
 
+There should be an end-of-timestep function so that later extensions can plug into.
+
 Analyzed and elaborated artifacts should use binary serialization by default, with inspectable RON serialization of the same versioned logical schema also supported. Both formats should be loadable and convertible without reanalyzing sources, and should produce identical simulation behavior.
 
 It should be possible to analyze files separately (although it may be OK to require that dependent files are analyzed before the current file).
@@ -32,3 +34,5 @@ CI should use GitHub Actions for pull requests and pushes, with formatting, comp
 Prefer to use enum types over string parsing in serialization and elsewhere. Consider carefully if string-ids are required or if the information can be obtained from other fields.
 
 VHDL-fixture-file-based tests are preferred, ideally with VHDL asserts to prove functionality. If required, it is also OK to inline VHDL source code in the test. Pure Rust-tests should be avoided if possible.
+
+For command line arguments, clap should be used.

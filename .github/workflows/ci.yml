@@ -1,0 +1,146 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: "1"
+
+jobs:
+  format:
+    name: Formatting
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+      - name: Install pinned toolchain
+        run: rustup toolchain install 1.98.0 --profile minimal --component rustfmt --component clippy
+      - name: Check production formatting
+        run: cargo fmt --all -- --check
+      - name: Check probe formatting
+        run: cargo fmt --manifest-path probes/parser/Cargo.toml --all -- --check
+
+  rust:
+    name: Rust (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm, windows-2022, macos-15]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+      - name: Install pinned toolchain
+        run: rustup toolchain install 1.98.0 --profile minimal --component rustfmt --component clippy
+      - uses: actions/cache@a7833574556fa59680c1b7cb190c1735db73ebf0
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-${{ runner.os }}-${{ runner.arch }}-1.98.0-${{ hashFiles('rust-toolchain.toml', 'Cargo.toml', 'Cargo.lock') }}
+      - name: Build library and binary
+        run: cargo build --workspace --all-targets --locked
+      - name: Check all targets
+        run: cargo check --workspace --all-targets --locked
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - name: Test CLI and diagnostic portability
+        run: cargo test --workspace --all-targets --locked
+      - name: CLI help smoke test
+        run: cargo run --locked -- --help
+
+  probes-inventory:
+    name: Probes and declaration inventory
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+      - name: Install pinned toolchain
+        run: rustup toolchain install 1.98.0 --profile minimal --component rustfmt --component clippy
+      - uses: actions/cache@a7833574556fa59680c1b7cb190c1735db73ebf0
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            probes/parser/target
+          key: cargo-probes-${{ runner.os }}-${{ runner.arch }}-1.98.0-${{ hashFiles('rust-toolchain.toml', 'probes/parser/Cargo.toml', 'probes/parser/Cargo.lock') }}
+      - name: Check probe targets
+        run: cargo check --manifest-path probes/parser/Cargo.toml --all-targets --locked
+      - name: Clippy probe targets
+        run: cargo clippy --manifest-path probes/parser/Cargo.toml --all-targets --locked -- -D warnings
+      - name: Test parser, inventory, and execution decisions
+        run: cargo test --manifest-path probes/parser/Cargo.toml --all-targets --locked
+      - name: Check out pinned Rust-HDL declarations
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          repository: VHDL-LS/rust_hdl
+          ref: dc8c090f7aeb9a95149eadc5e8b48f170382a8d4
+          path: .references/rust-hdl
+          persist-credentials: false
+          sparse-checkout: vhdl_libraries
+      - name: Check out pinned GHDL declarations
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          repository: ghdl/ghdl
+          ref: a977191e75d345ee30a936279f425265e52b37b3
+          path: .references/ghdl
+          persist-credentials: false
+          sparse-checkout: |
+            libraries/std
+            libraries/ieee2008
+      - name: Check out pinned NVC declarations
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          repository: nickg/nvc
+          ref: 8630448e4a25aa4bd74066b94eba08063597a3ca
+          path: .references/nvc
+          persist-credentials: false
+          sparse-checkout: |
+            lib/std.08
+            lib/ieee.08
+            lib/ieee
+      - name: Audit declaration inventory without executing standard bodies
+        run: >-
+          cargo run --quiet --manifest-path probes/parser/Cargo.toml --locked
+          --example inventory -- --check
+          .references/rust-hdl .references/ghdl .references/nvc
+          docs/native-declarations.md
+
+  workflow:
+    name: Workflow syntax
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+      - name: Validate workflow with checksum-pinned Actionlint 1.7.7
+        run: |
+          curl --fail --silent --show-error --location \
+            --output "$RUNNER_TEMP/actionlint.tar.gz" \
+            https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_linux_amd64.tar.gz
+          printf '%s  %s\n' \
+            023070a287cd8cccd71515fedc843f1985bf96c436b7effaecce67290e7e0757 \
+            "$RUNNER_TEMP/actionlint.tar.gz" | sha256sum --check --status
+          tar -xzf "$RUNNER_TEMP/actionlint.tar.gz" -C "$RUNNER_TEMP" actionlint
+          "$RUNNER_TEMP/actionlint" -shellcheck= -pyflakes= .github/workflows/ci.yml

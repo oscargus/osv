@@ -2,7 +2,7 @@
 
 This document and [native-declarations.md](native-declarations.md) implement chunk `002` of [../PLAN.md](../PLAN.md). The scope follows [../project.md](../project.md), including all IEEE 1076-2008 packages, all three `std` packages, VCD/FST output, and GitHub Actions CI.
 
-This is a target inventory, not a simulator support claim. Only the parser/source probes and inventory tooling exist. All implementation owners and fixture IDs below are planned unless a handoff explicitly records otherwise. No standard package body is loaded or interpreted by the inventory tool.
+This is a target inventory, not a simulator support claim. The parser/source and decision probes, inventory tooling, and production bootstrap exist; no VHDL analysis or simulation implementation is claimed. All language/package implementation owners and fixture IDs below are planned unless a handoff explicitly records otherwise. No standard package body is loaded or interpreted by the inventory tool. See [execution-and-artifacts.md](execution-and-artifacts.md) for chunk `003` decisions and [bootstrap.md](bootstrap.md) for the chunk `004` package/CI boundaries and pending hosted verification.
 
 ## Inventory Contract
 
@@ -32,7 +32,7 @@ Licensing/provenance remains per source. Rust-HDL's parser has MPL-2.0 notices; 
 | ID | Observation | Required Decision / Owner |
 | --- | --- | --- |
 | D01 | Rust-HDL's `std.standard` source omits many compiler-provided operations. NVC's source omits the explicit bit/boolean edge declarations present in Rust-HDL. | Include the implicit templates below plus all four standard bit/boolean edge overloads. Owners `035`, `040`, `057`. |
-| D02 | Rust-HDL and NVC use different lower bounds for `INTEGER` and `TIME`. | Retain both source variants as implementation-defined limits; choose OSV's limits in `003`, not by merging declarations. |
+| D02 | Rust-HDL and NVC use different lower bounds for `INTEGER` and `TIME`. | Retain both source variants as provenance. Chunk `003` selects signed 64-bit `INTEGER` and femtosecond `TIME`, including the extra negative endpoint; see [execution-and-artifacts.md](execution-and-artifacts.md). Do not merge competing declarations. |
 | D03 | GHDL's `std.textio` declaration omits `WRITE(L, REAL, FORMAT : STRING)`, but NVC's `std.08` and Rust-HDL include it. | It is required 2008 coverage, owner `107`; do not misclassify it as 2019 merely because one reference omits it. |
 | D04 | Rust-HDL's `std.textio` explicitly includes `FILE_REWIND`, `FILE_MODE`, and `FILE_SIZE`. They are absent from both selected 2008 references and appear with later file-position facilities. | Exclude these from OSV's 2008 prelude, diagnose their use, owner `015`. Do not remove ordinary 2008 file operations or `FLUSH`. |
 | D05 | GHDL's `std.env` template includes assert-count/clear routines inside a V19 block. NVC has additional environment/reflection facilities under `std.19`. | Exclude later interfaces; 2008 `std.env` has both `STOP` overloads, both `FINISH` overloads, and `RESOLUTION_LIMIT`. Owner `059`. |

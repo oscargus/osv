@@ -6,6 +6,11 @@ rust-version = "1.95"
 publish = false
 
 [dependencies]
-vhdl_syntax = { git = "https://github.com/VHDL-LS/rust_hdl.git", branch = "master" }
+vhdl_syntax = { git = "https://github.com/VHDL-LS/rust_hdl.git", rev = "dc8c090f7aeb9a95149eadc5e8b48f170382a8d4" }
+
+[dev-dependencies]
+postcard = { version = "1.1", default-features = false, features = ["alloc"] }
+ron = "0.12"
+serde = { version = "1", features = ["derive"] }
 
 [workspace]

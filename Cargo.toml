@@ -1,0 +1,19 @@
+[package]
+name = "osv"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.98"
+description = "Foundations for a VHDL 2008 event-driven compiled simulator"
+publish = false
+
+[dependencies]
+ariadne = { version = "0.6", default-features = false }
+clap = { version = "4.6", default-features = false, features = ["std", "derive", "help", "usage", "error-context"] }
+postcard = { version = "1.1", default-features = false, features = ["alloc"] }
+ron = "0.12"
+serde = { version = "1", features = ["derive"] }
+vhdl_syntax = { git = "https://github.com/VHDL-LS/rust_hdl.git", rev = "dc8c090f7aeb9a95149eadc5e8b48f170382a8d4" }
+
+[workspace]
+exclude = ["probes/parser"]
+resolver = "3"
