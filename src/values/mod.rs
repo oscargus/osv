@@ -1,3 +1,4 @@
+mod bounds;
 mod scalar;
 mod time;
 
@@ -5,6 +6,7 @@ use std::{error::Error, fmt};
 
 use crate::artifacts::TypeId;
 
+pub use bounds::{ArrayDimension, ArrayShape, Direction, IndexRange, RangeConstraint};
 pub use scalar::{
     BitValue, EnumerationValue, IntegerValue, PhysicalValue, PrimitiveValue, RealValue,
 };
@@ -34,6 +36,19 @@ pub enum ValueError {
         femtoseconds: i64,
         resolution_fs: u64,
     },
+    IndexBounds {
+        index: i64,
+        range: IndexRange,
+    },
+    StorageOffset {
+        offset: u64,
+        length: u64,
+    },
+    ArrayDimensions {
+        expected: usize,
+        actual: usize,
+    },
+    UnconstrainedArray,
 }
 
 impl fmt::Display for ValueError {
@@ -72,6 +87,20 @@ impl fmt::Display for ValueError {
                 formatter,
                 "time {femtoseconds} fs is not an exact multiple of resolution {resolution_fs} fs"
             ),
+            Self::IndexBounds { index, range } => write!(
+                formatter,
+                "array index {index} is outside {} {:?} {}",
+                range.left, range.direction, range.right
+            ),
+            Self::StorageOffset { offset, length } => write!(
+                formatter,
+                "storage offset {offset} is outside array length {length}"
+            ),
+            Self::ArrayDimensions { expected, actual } => write!(
+                formatter,
+                "expected {expected} array dimensions, found {actual}"
+            ),
+            Self::UnconstrainedArray => formatter.write_str("array bounds are not constrained"),
         }
     }
 }

@@ -2,7 +2,7 @@
 
 This is an execution plan for the simulator described in [project.md](project.md), including the additional requirement that artifacts use binary serialization by default and also support inspectable RON serialization.
 
-Chunks `001`-`011` are complete, covering the foundation, artifact tools/store, and primitive values/time. Chunk `004` has passing hosted checks on Linux x86-64/ARM64, Windows, and macOS. Production VHDL analysis, elaboration, and simulation are not implemented; checked chunks and their handoffs record verified progress.
+Chunks `001`-`012` are complete, covering the foundation, artifact tools/store, primitive values/time, and array bounds/index mapping. Chunk `004` has passing hosted checks on Linux x86-64/ARM64, Windows, and macOS. Production VHDL analysis, elaboration, and simulation are not implemented; checked chunks and their handoffs record verified progress.
 
 ## How to Run This Plan
 
@@ -258,12 +258,14 @@ Waveform generation is optional and is separate from artifact serialization: VCD
 
 **Handoff (2026-10-27):** Complete. See [docs/primitive-values.md](docs/primitive-values.md) and [src/values/mod.rs](src/values/mod.rs). Added `PrimitiveValue`, two-state bits, type-linked enum/physical records, checked signed integers, finite bit-exact `RealValue`, signed-femtosecond `TimeValue`, six explicit `TimeResolution` policies, and validated nonnegative `SimulationTime`; common `ValueError` distinguishes overflow, range/type/position, zero-divisor, nonfinite, scale, negative-delay, and resolution-loss errors. Enum positions require contextual validation against their declaration; real/tick invariants also validate during decoding. The first checked-add overflow test passed immediately after the small edit. Nine focused tests cover signed boundaries/overflow, enum identity/positions, real signed-zero/subnormal bits, physical conversion, time units/resolutions/loss/delays, zero/end-time advancement, both-codec boundary fixtures, and invalid decoding. Root formatting/check/strict Clippy/all-target tests pass (90 total). No dependencies or artifact-envelope schema changed; no VHDL interpreter, package body, scheduler, full real/physical arithmetic, or later array/vector feature was introduced. The fixture is explicitly synthetic until real analysis enables VHDL assertions. No blockers; `012` should keep bounds/direction separate from storage.
 
-### [ ] 012 - Implement Array Bounds and Index Mapping
+### [x] 012 - Implement Array Bounds and Index Mapping
 
 - **Work:** Add constrained/unconstrained range descriptors, ascending/descending directions, logical-to-storage index mapping, null ranges, lengths, and multidimensional shape metadata. Keep array shape separate from element storage.
 - **Checks:** Test nonzero lower bounds, `to`/`downto`, null arrays, extreme/overflowing bounds, out-of-range indexing, and shape serialization.
 - **Done When:** Vector and general-array operations can share a correct indexing abstraction.
 - **Do Not:** Treat all VHDL arrays as zero-based descending bit vectors or reject legal null ranges.
+
+**Handoff (2026-10-27):** Complete. See [docs/array-bounds.md](docs/array-bounds.md) and [src/values/bounds.rs](src/values/bounds.rs). Added typed directions, retained signed endpoint ranges, constrained/unconstrained descriptors, index-type-linked dimensions, and multidimensional shapes separate from element storage. `length` handles null ranges before arithmetic; `offset`/`index_at` and shape mapping use checked logical/storage conversions with rightmost-fast dimension order. Length/product overflow, bad index/offset/arity, empty access, and unconstrained allocation are explicit `ValueError`s; null shapes remain legal even beside huge ranges. The first null/extreme-range test passed immediately after the small edit. Seven tests cover both directions/nonzero origins, singleton/extreme endpoints, large inverse offsets, null/product boundaries, multidimensional mappings, deferred bounds, and binary/RON shape-fixture parity. Root formatting/check/strict Clippy/all-target tests pass (97 total). No dependencies, envelope schema, packed storage, logic values, parser/semantic stage, or later array operation changed. No blockers; `013` must preserve this metadata separately from packed bit storage and signed interpretation.
 
 ### [ ] 013 - Implement Packed Binary Vectors
 

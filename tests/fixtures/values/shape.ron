@@ -1,0 +1,16 @@
+(
+    kind: HarnessSelfTest,
+    sources: [],
+    expected: (
+        stage: Artifact,
+        diagnostics: [],
+        exit_status: 0,
+        result: (
+            dimensions: [
+                (index_type: TypeId(2), range: Constrained(IndexRange(left: 7, right: 8, direction: Ascending))),
+                (index_type: TypeId(2), range: Constrained(IndexRange(left: -1, right: -3, direction: Descending))),
+            ],
+        ),
+        output: "",
+    ),
+)
