@@ -1,5 +1,6 @@
 mod binary;
 mod bounds;
+mod logic;
 mod scalar;
 mod time;
 
@@ -9,6 +10,7 @@ use crate::artifacts::TypeId;
 
 pub use binary::{MAX_VECTOR_BITS, PackedBinary, PackedStorage};
 pub use bounds::{ArrayDimension, ArrayShape, Direction, IndexRange, RangeConstraint};
+pub use logic::{LogicState, LogicStorage, LogicVector};
 pub use scalar::{
     BitValue, EnumerationValue, IntegerValue, PhysicalValue, PrimitiveValue, RealValue,
 };
@@ -16,6 +18,7 @@ pub use time::{SimulationTime, TimeResolution, TimeUnit, TimeValue};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum ValueError {
+    AllocationLimit,
     VectorWidth {
         width: u64,
         maximum: u64,
@@ -69,6 +72,7 @@ pub enum ValueError {
 impl fmt::Display for ValueError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Self::AllocationLimit => formatter.write_str("value storage allocation failed"),
             Self::VectorWidth { width, maximum } => write!(
                 formatter,
                 "vector width {width} exceeds storage limit {maximum}"

@@ -2,7 +2,7 @@
 
 This is an execution plan for the simulator described in [project.md](project.md), including the additional requirement that artifacts use binary serialization by default and also support inspectable RON serialization.
 
-Chunks `001`-`013` are complete, covering the foundation, artifact tools/store, primitive values/time, array bounds/index mapping, and packed binary vectors. Chunk `004` has passing hosted checks on Linux x86-64/ARM64, Windows, and macOS. Production VHDL analysis, elaboration, and simulation are not implemented; checked chunks and their handoffs record verified progress.
+Chunks `001`-`014` are complete, covering the foundation, artifact tools/store, primitive values/time, array bounds/index mapping, and packed/lossless nine-state vectors. Chunk `004` has passing hosted checks on Linux x86-64/ARM64, Windows, and macOS. Production VHDL analysis, elaboration, and simulation are not implemented; checked chunks and their handoffs record verified progress.
 
 ## How to Run This Plan
 
@@ -276,12 +276,14 @@ Waveform generation is optional and is separate from artifact serialization: VCD
 
 **Handoff (2026-10-27):** Complete. See [docs/packed-vectors.md](docs/packed-vectors.md) and [src/values/binary.rs](src/values/binary.rs). `PackedBinary` retains explicit width, `u64` storage through 64 bits, and `BigUint` above it; checked constructors and explicitly named masked conversions are separate. Rightmost-first bit access integrates with declared ranges; signed interpretation uses the same bits without a signed-storage flag. Both codecs use canonical explicit little-endian `u32` limbs, rejecting redundant/oversized/noncanonical encodings. `MAX_VECTOR_BITS = 32_000_000` is a documented resource limit matching the initial million-limb budget. Compatible dependencies resolve `num-bigint 0.4.8` and dev-only `proptest 1.12.0`. The first zero/full-word mask test passed immediately after the small edit; one local extra delimiter was fixed and the focused suite rerun. Six tests include widths 0/1/31/32/63/64/65/128 and large vectors, leading zeros, signed negatives, both directions, limb fixtures, and randomized bit/codec parity. Root formatting/check/strict Clippy/all-target tests pass (103 total). No envelope schema, nonbinary approximation, numeric package semantics, source parser, or simulation stage changed. No blockers; `014` must preserve all nine logic states and only repack exact binary values.
 
-### [ ] 014 - Implement Lossless Nine-State Vector Storage
+### [x] 014 - Implement Lossless Nine-State Vector Storage
 
 - **Work:** Add scalar logic states `U X 0 1 Z W L H -` and a compact lossless vector fallback. Support promotion from packed storage and safe return to packed storage when every element is exactly `0` or `1`. Keep resolution and numeric interpretation outside the storage layer.
 - **Checks:** Property-test transitions at small/big boundaries, all nine states, null vectors, slices, and binary/RON equality. Verify that `L` and `H` do not become `0` and `1` just because storage is optimized.
 - **Done When:** Optimized and fallback representations are observably equivalent for the same VHDL value.
 - **Do Not:** Collapse unknown/high-impedance/weak values or use a two-state representation for all unsigned operations.
+
+**Handoff (2026-10-27):** Complete. See [docs/logic-vectors.md](docs/logic-vectors.md) and [src/values/logic.rs](src/values/logic.rs). Added all nine typed states and `LogicVector` with packed binary or four-bit-per-state fallback, immutable storage inspection, checked logical/storage access, lossless promotion, exact-binary-only repacking, and storage-position slice copies. `L`/`H` remain weak states, never storage-level `0`/`1`. Equality is representation-independent; both codecs emit canonical binary values or readable named state lists and reject unknown states. Fallible fallback allocation shares the packed width cap; artifact collection budgets remain explicit. The first all-nine-state packability check passed immediately after the small edit. Six tests cover compactness, small/big boundaries, promotion/restoration, weak/unknown/high-impedance retention, null/slice/index/direction boundaries, named RON fixtures, and randomized state/reference/codec parity. Root formatting/check/strict Clippy/all-target tests pass (109 total); editor diagnostics are clean. No dependencies or envelope schema changed; no resolution/numeric policy, full VHDL slice semantics, native package body, or runtime stage was introduced. No blockers; `015` should now wrap the pinned parser through shared Latin-1 sources/diagnostics without implementing semantic rules.
 
 ### [ ] 015 - Wrap the Parser Behind a Syntax Adapter
 
