@@ -1,0 +1,8 @@
+"[OSV-TYPE-MISMATCH] Error: saved design type mismatch
+  = note: stage: simulation
+  = note: source unavailable: missing/design.vhd:bytes 12..15: stored assignment
+  = note: source unavailable: <source 99>:bytes 20..24: original declaration
+  = note: expected type: bit_vector(7 downto 0)
+  = note: actual type: bit_vector(3 downto 0)
+  = note: context 1: instance work.tb.u1
+"

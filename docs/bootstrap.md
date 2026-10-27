@@ -64,12 +64,14 @@ claim its future options work. No stage reads sources, resolves a library,
 writes an artifact, or produces simulation output. The binary also maps output
 failures to a nonzero `OSV-CLI-IO` diagnostic.
 
-[../src/diagnostics.rs](../src/diagnostics.rs) provides only
+[../src/diagnostics.rs](../src/diagnostics.rs) preserves the bootstrap contract
 `display_path(&Path) -> String`: lossy host-path display with separators
 normalized to `/`, preserving drive/UNC prefixes and relative components. This
 is **not** canonical filesystem identity, path resolution, a source manager, a
 byte-span model, or a full renderer. Do not use display labels as artifact IDs or
-file-open paths. Chunk `005` owns the structured diagnostic interfaces.
+file-open paths. Chunk `005` adds the separate shared source records and
+structured diagnostic interfaces described in
+[source-and-diagnostics.md](source-and-diagnostics.md).
 
 The nine integration smoke tests in [../tests/cli.rs](../tests/cli.rs) execute the
 real binary and check generated/nested help, unavailable stages, usage failures,

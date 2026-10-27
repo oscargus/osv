@@ -36,3 +36,5 @@ Prefer to use enum types over string parsing in serialization and elsewhere. Con
 VHDL-fixture-file-based tests are preferred, ideally with VHDL asserts to prove functionality. If required, it is also OK to inline VHDL source code in the test. Pure Rust-tests should be avoided if possible.
 
 For command line arguments, clap should be used.
+
+Split the project and tests over multiple files in a sensible way so that one does not end up with just a few single files with 10k+ lines.

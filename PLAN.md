@@ -2,7 +2,7 @@
 
 This is an execution plan for the simulator described in [project.md](project.md), including the additional requirement that artifacts use binary serialization by default and also support inspectable RON serialization.
 
-Chunks `001`-`004` are complete: parser/source verification, language/native-package inventories, execution/artifact decisions, and the Rust library/binary and GitHub Actions bootstrap. Chunk `004` has passing hosted checks on Linux x86-64/ARM64, Windows, and macOS. Production VHDL analysis, elaboration, and simulation are not implemented; checked chunks and their handoffs record verified progress.
+Chunks `001`-`005` are complete: parser/source verification, language/native-package inventories, execution/artifact decisions, the Rust library/binary and GitHub Actions bootstrap, and shared source management/diagnostics. Chunk `004` has passing hosted checks on Linux x86-64/ARM64, Windows, and macOS. Production VHDL analysis, elaboration, and simulation are not implemented; checked chunks and their handoffs record verified progress.
 
 ## How to Run This Plan
 
@@ -193,12 +193,14 @@ Waveform generation is optional and is separate from artifact serialization: VCD
 
 **Acceptance Handoff (2026-10-27):** Complete. [Hosted CI run 40522628058](https://github.com/oscargus/osv/actions/runs/40522628058) for checkout commit `8a6ac6a259b6376a0d0ae2b23970e0ee5151395b` passed all seven jobs: formatting, workflow syntax, probes/declaration inventory, and Rust build/check/strict Clippy/tests/help on `ubuntu-24.04`, `ubuntu-24.04-arm`, `windows-2022`, and `macos-15`, including diagnostic portability. Both lockfiles are tracked. Local `cargo fmt`, build/check/strict Clippy, all nine root tests, help, and the isolated probe's formatting/check/strict Clippy/23 tests pass. The new focused `bootstrap_artifact_format_options_remain_explicit_errors` test passed immediately after editing; it checks explicit status `2` errors for binary/RON analysis, elaboration, and conversion options. This ninth test is locally verified and postdates the hosted run. No public interfaces, dependencies, parser pins, or stage implementations changed. No remaining chunk `004` blocker; branch-protection administration remains a maintainer responsibility, not a verified repository setting. No later chunks were started.
 
-### [ ] 005 - Introduce Source Management and Diagnostics
+### [x] 005 - Introduce Source Management and Diagnostics
 
 - **Work:** Add stable source/file IDs, byte spans, a structured diagnostic model, diagnostic codes/severity/related labels/notes, and an `ariadne` renderer. Support labels in multiple files and nested context without embedding rendering logic in semantic code.
 - **Checks:** Snapshot syntax and synthetic type-mismatch diagnostics, including non-ASCII source text, multiple files, missing-source fallback, and expected/actual type notes. Check stable exit-status mapping.
 - **Done When:** Later stages can report rich diagnostics using shared structured data.
 - **Do Not:** Couple semantic errors to terminal output or require the original source path to exist for artifact diagnostics.
+
+**Handoff (2026-10-27):** Complete. See [docs/source-and-diagnostics.md](docs/source-and-diagnostics.md), [src/source.rs](src/source.rs), and [src/diagnostics.rs](src/diagnostics.rs). New contracts: `SourceId`, half-open `ByteSpan`, owned Latin-1 `SourceFile`, and `SourceMap` with stable/importable IDs, checked allocation, duplicate rejection, and deterministic iteration; serializable diagnostic stage/code/severity, primary/related labels, expected/actual notes, and outer-to-inner context frames; `render` writes through Ariadne to an injected writer. Missing sources and invalid spans retain names/offsets/messages without filesystem reads or panics. Latin-1 bytes map to Ariadne character coordinates; source bytes remain unchanged. `exit_status` maps advice/warnings to `0`, stage errors to `1`, and command-line errors to `2`. Existing `display_path` and CLI contracts are unchanged. The first focused byte-span test passed immediately after the initial edit; all three diagnostic snapshots and boundary/codec-parity tests pass, including LF/CRLF snapshot checkouts. Root `cargo fmt --all`, `cargo check --workspace --all-targets --locked`, strict `cargo clippy --workspace --all-targets --locked -- -D warnings`, and `cargo test --workspace --all-targets --locked` pass (26 tests: nine CLI, four source, thirteen diagnostic). The isolated probe's formatting/check/strict Clippy and 23 tests also pass; editor diagnostics and patch hygiene are clean. No dependencies or lockfiles changed. No blockers; no reusable fixture harness, production parser adapter, artifact schema/codecs, or later-stage implementation was added. Existing CI discovers the new test targets; no hosted result for this uncommitted change is claimed.
 
 ### [ ] 006 - Establish Fixture and Golden-Test Helpers
 

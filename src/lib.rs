@@ -8,6 +8,6 @@ pub mod elaboration {}
 pub mod intrinsics {}
 pub mod lowering {}
 pub mod runtime {}
-pub mod source {}
+pub mod source;
 pub mod syntax {}
 pub mod values {}

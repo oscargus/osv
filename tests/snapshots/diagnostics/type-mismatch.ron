@@ -1,0 +1,28 @@
+"[OSV-TYPE-MISMATCH] Error: initializer type mismatch
+   ,-[ fixtures/target.vhd:1:26 ]
+   |
+ 1 | signal caf\u{e9} : boolean := 42;
+   |                          ^|
+   |                           `-- initializer has type integer
+   |
+   |-[ fixtures/value.vhd:1:21 ]
+   |
+ 1 | constant supplied : integer := 42;
+   |          ^^^^|^^^   ^^^|^^^
+   |              |         `----- value declared with type integer
+   |              |
+   |              `--------------- context 2: call work.values.choose
+   |
+   | Note 1: stage: elaboration
+   |
+   | Note 2: expected type: boolean
+   |
+   | Note 3: actual type: integer range 0 to 255
+   |
+   | Note 4: no implicit integer-to-boolean conversion is permitted
+   |
+   | Note 5: context 1: instance work.tb.u0
+   |
+   | Note 6: context 2: call work.values.choose
+---'
+"

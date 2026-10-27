@@ -1,0 +1,10 @@
+"[OSV-SYNTAX] Error: expected entity ending
+   ,-[ fixtures/broken.vhd:2:17 ]
+   |
+ 2 | entity broken is
+   |                 |
+   |                 `- entity declaration is incomplete
+   |
+   | Note: stage: analysis
+---'
+"
