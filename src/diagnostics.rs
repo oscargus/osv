@@ -55,6 +55,11 @@ pub enum DiagnosticCode {
     SourceUnavailable,
     SourceTooLarge,
     PslUnsupported,
+    DuplicateDeclaration,
+    MissingUnit,
+    WrongSecondaryParent,
+    MissingLibrary,
+    UnsupportedFeature,
 }
 
 impl fmt::Display for DiagnosticCode {
@@ -73,6 +78,11 @@ impl fmt::Display for DiagnosticCode {
             Self::SourceUnavailable => "OSV-SOURCE-UNAVAILABLE",
             Self::SourceTooLarge => "OSV-SOURCE-TOO-LARGE",
             Self::PslUnsupported => "OSV-PSL-UNSUPPORTED",
+            Self::DuplicateDeclaration => "OSV-DUPLICATE-DECLARATION",
+            Self::MissingUnit => "OSV-MISSING-UNIT",
+            Self::WrongSecondaryParent => "OSV-WRONG-SECONDARY-PARENT",
+            Self::MissingLibrary => "OSV-MISSING-LIBRARY",
+            Self::UnsupportedFeature => "OSV-UNSUPPORTED-FEATURE",
         })
     }
 }

@@ -1,6 +1,6 @@
 #![forbid(unsafe_code)]
 
-pub mod analysis {}
+pub mod analysis;
 pub mod artifacts;
 pub mod cli;
 pub mod diagnostics;

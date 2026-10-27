@@ -67,8 +67,9 @@ and scope data participates in logical identity. These fields are incompatible
 with the original schema `1`, which is deliberately rejected rather than
 silently migrated or filled with guessed default scopes. Compiler epoch and
 native ABI remain `1`. This is persistence/validation only: name lookup and
-syntax registration remain in ordered child `016b`, with the parent `016`
-unchecked until that work and its checks finish.
+syntax registration are implemented separately by child `016b`; see
+[scopes-and-names.md](scopes-and-names.md). These do not imply type checking or
+an implemented analysis command.
 
 ## Source Fidelity
 
