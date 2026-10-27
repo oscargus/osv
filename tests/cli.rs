@@ -48,6 +48,42 @@ fn bootstrap_stage_commands_are_explicit_errors() {
 }
 
 #[test]
+fn bootstrap_artifact_format_options_remain_explicit_errors() {
+    for format in ["binary", "ron"] {
+        for (command, arguments) in [
+            (
+                "analyze",
+                vec!["analyze", "--artifact-format", format, "not-a-source.vhd"],
+            ),
+            (
+                "elaborate",
+                vec!["elaborate", "work.top", "--artifact-format", format],
+            ),
+            (
+                "artifact convert",
+                vec![
+                    "artifact",
+                    "convert",
+                    "not-an-artifact.osve",
+                    "--to",
+                    format,
+                ],
+            ),
+        ] {
+            let output = run(&arguments);
+            assert_eq!(output.status.code(), Some(2));
+            assert!(output.stdout.is_empty());
+            assert_eq!(
+                String::from_utf8(output.stderr).unwrap(),
+                format!(
+                    "error[OSV-CLI-UNIMPLEMENTED]: command {command:?} is not implemented yet\n"
+                ),
+            );
+        }
+    }
+}
+
+#[test]
 fn bootstrap_unknown_commands_and_options_fail() {
     for arguments in [
         &["unknown"][..],

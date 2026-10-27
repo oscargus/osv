@@ -71,9 +71,10 @@ is **not** canonical filesystem identity, path resolution, a source manager, a
 byte-span model, or a full renderer. Do not use display labels as artifact IDs or
 file-open paths. Chunk `005` owns the structured diagnostic interfaces.
 
-The eight integration smoke tests in [../tests/cli.rs](../tests/cli.rs) execute the
+The nine integration smoke tests in [../tests/cli.rs](../tests/cli.rs) execute the
 real binary and check generated/nested help, unavailable stages, usage failures,
-version, and Clap's display precedence.
+version, and Clap's display precedence. Binary/RON options for analysis,
+elaboration, and conversion must still return explicit unimplemented errors.
 They also parse malformed ASCII VHDL in explicit 2008 mode and render the actual
 parser span with Ariadne, checking byte-for-byte identical, color-free output
 for slash/backslash labels and retention of drive/UNC prefixes. This is a
@@ -104,17 +105,19 @@ declaration report `--check` command and exact reference-source roots.
 ### Local Results
 
 Verified on 2026-10-27 with Rust `1.98.0`: root formatting, library/binary build,
-check, strict Clippy and all eight integration tests pass. Probe formatting,
-check, strict Clippy and all 23 tests pass. The pinned-source declaration report
-`--check` matches all 1,870 profiles. Checksum-verified Actionlint accepts the
-workflow; editor diagnostics and patch hygiene checks are clean.
+check, strict Clippy and all nine integration tests pass. Probe formatting,
+check, strict Clippy and all 23 tests pass. The new artifact-format rejection
+test passed as the first check after its edit. The hosted jobs below verify the
+1,870-profile declaration report and checksum-pinned Actionlint. Editor
+diagnostics and patch hygiene checks are clean.
 
 Before the Clap/dependency follow-up, a source export without Git metadata or
 previous build outputs was tested with an empty `CARGO_HOME` and target
 directory. `cargo test --workspace --all-targets --locked` fetched dependencies,
 built the library/binary, and passed the original six integration tests. That
 historical result is not fresh-cache certification of the updated dependencies,
-nor hosted or non-Linux certification.
+nor hosted or non-Linux certification; the hosted acceptance below verifies the
+updated dependency resolutions on fresh runner checkouts.
 
 ## GitHub Actions
 
@@ -143,7 +146,20 @@ No placeholder jobs claim these features pass.
 
 Maintainers must configure these job names as required status checks in GitHub
 branch protection; workflow files cannot set that repository administration
-policy. At implementation time this checkout has no Git remote, so hosted job
-execution, non-Linux results, and branch-protection settings cannot be verified
-locally. Local syntax/command checks are not a hosted CI pass. Keep chunk `004`
-pending until its required hosted smoke/matrix results have been observed.
+policy. Branch-protection settings have not been verified.
+
+### Hosted Acceptance
+
+On 2026-10-27, [CI run 40522628058](https://github.com/oscargus/osv/actions/runs/40522628058)
+for `8a6ac6a259b6376a0d0ae2b23970e0ee5151395b` passed all seven jobs in the table
+above, including all four Rust runners. The run was triggered by `push`;
+Actionlint also validated the configured `pull_request` trigger. Each Rust job
+built the library/binary with `--locked`, ran check/strict Clippy/tests, and
+executed the CLI help smoke test. Diagnostic path tests passed on every runner.
+The inventory and workflow-syntax jobs passed without missing-tool skips.
+
+This resolves chunk `004`'s original hosted-verification blocker. The ninth CLI
+test was added after that commit and passes locally; it was not part of this
+hosted run. Public interfaces, lockfiles, dependencies, and workflow definitions
+remain unchanged. Production analysis, elaboration, simulation, artifact codecs,
+native package execution, and waveform output remain assigned to later chunks.
