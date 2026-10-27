@@ -2,7 +2,7 @@
 
 This is an execution plan for the simulator described in [project.md](project.md), including the additional requirement that artifacts use binary serialization by default and also support inspectable RON serialization.
 
-Chunks `001`-`012` are complete, covering the foundation, artifact tools/store, primitive values/time, and array bounds/index mapping. Chunk `004` has passing hosted checks on Linux x86-64/ARM64, Windows, and macOS. Production VHDL analysis, elaboration, and simulation are not implemented; checked chunks and their handoffs record verified progress.
+Chunks `001`-`013` are complete, covering the foundation, artifact tools/store, primitive values/time, array bounds/index mapping, and packed binary vectors. Chunk `004` has passing hosted checks on Linux x86-64/ARM64, Windows, and macOS. Production VHDL analysis, elaboration, and simulation are not implemented; checked chunks and their handoffs record verified progress.
 
 ## How to Run This Plan
 
@@ -267,12 +267,14 @@ Waveform generation is optional and is separate from artifact serialization: VCD
 
 **Handoff (2026-10-27):** Complete. See [docs/array-bounds.md](docs/array-bounds.md) and [src/values/bounds.rs](src/values/bounds.rs). Added typed directions, retained signed endpoint ranges, constrained/unconstrained descriptors, index-type-linked dimensions, and multidimensional shapes separate from element storage. `length` handles null ranges before arithmetic; `offset`/`index_at` and shape mapping use checked logical/storage conversions with rightmost-fast dimension order. Length/product overflow, bad index/offset/arity, empty access, and unconstrained allocation are explicit `ValueError`s; null shapes remain legal even beside huge ranges. The first null/extreme-range test passed immediately after the small edit. Seven tests cover both directions/nonzero origins, singleton/extreme endpoints, large inverse offsets, null/product boundaries, multidimensional mappings, deferred bounds, and binary/RON shape-fixture parity. Root formatting/check/strict Clippy/all-target tests pass (97 total). No dependencies, envelope schema, packed storage, logic values, parser/semantic stage, or later array operation changed. No blockers; `013` must preserve this metadata separately from packed bit storage and signed interpretation.
 
-### [ ] 013 - Implement Packed Binary Vectors
+### [x] 013 - Implement Packed Binary Vectors
 
 - **Work:** Add packed small-vector storage through 64 bits and a `BigUint`-backed representation above it. Define masking, limb/bit order, width-preserving conversion, and signed interpretation without conflating signedness with storage.
 - **Checks:** Test widths 0, 1, 31, 32, 63, 64, 65, 128, and a large width; round-trip randomized values; cover leading zeros, negative signed interpretation, and both index directions.
 - **Done When:** Binary-only vectors never require a per-bit allocation merely to represent their value, and wide values are not truncated.
 - **Do Not:** Use host integer width as the VHDL vector width or store negative signed numbers as an unrelated array format.
+
+**Handoff (2026-10-27):** Complete. See [docs/packed-vectors.md](docs/packed-vectors.md) and [src/values/binary.rs](src/values/binary.rs). `PackedBinary` retains explicit width, `u64` storage through 64 bits, and `BigUint` above it; checked constructors and explicitly named masked conversions are separate. Rightmost-first bit access integrates with declared ranges; signed interpretation uses the same bits without a signed-storage flag. Both codecs use canonical explicit little-endian `u32` limbs, rejecting redundant/oversized/noncanonical encodings. `MAX_VECTOR_BITS = 32_000_000` is a documented resource limit matching the initial million-limb budget. Compatible dependencies resolve `num-bigint 0.4.8` and dev-only `proptest 1.12.0`. The first zero/full-word mask test passed immediately after the small edit; one local extra delimiter was fixed and the focused suite rerun. Six tests include widths 0/1/31/32/63/64/65/128 and large vectors, leading zeros, signed negatives, both directions, limb fixtures, and randomized bit/codec parity. Root formatting/check/strict Clippy/all-target tests pass (103 total). No envelope schema, nonbinary approximation, numeric package semantics, source parser, or simulation stage changed. No blockers; `014` must preserve all nine logic states and only repack exact binary values.
 
 ### [ ] 014 - Implement Lossless Nine-State Vector Storage
 

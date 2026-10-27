@@ -1,0 +1,11 @@
+(
+    kind: HarnessSelfTest,
+    sources: [],
+    expected: (
+        stage: Artifact,
+        diagnostics: [],
+        exit_status: 0,
+        result: PackedBinary(width: 128, storage: Big(limbs_le: [2, 0, 1])),
+        output: "",
+    ),
+)

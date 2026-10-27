@@ -1,3 +1,4 @@
+mod binary;
 mod bounds;
 mod scalar;
 mod time;
@@ -6,6 +7,7 @@ use std::{error::Error, fmt};
 
 use crate::artifacts::TypeId;
 
+pub use binary::{MAX_VECTOR_BITS, PackedBinary, PackedStorage};
 pub use bounds::{ArrayDimension, ArrayShape, Direction, IndexRange, RangeConstraint};
 pub use scalar::{
     BitValue, EnumerationValue, IntegerValue, PhysicalValue, PrimitiveValue, RealValue,
@@ -14,6 +16,19 @@ pub use time::{SimulationTime, TimeResolution, TimeUnit, TimeValue};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum ValueError {
+    VectorWidth {
+        width: u64,
+        maximum: u64,
+    },
+    VectorValueTooWide {
+        width: u64,
+        bits: u64,
+    },
+    VectorEncoding(&'static str),
+    WidthMismatch {
+        expected: u64,
+        actual: u64,
+    },
     Overflow,
     ZeroDivisor,
     IntegerRange {
@@ -54,6 +69,20 @@ pub enum ValueError {
 impl fmt::Display for ValueError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Self::VectorWidth { width, maximum } => write!(
+                formatter,
+                "vector width {width} exceeds storage limit {maximum}"
+            ),
+            Self::VectorValueTooWide { width, bits } => write!(
+                formatter,
+                "{bits}-bit magnitude does not fit vector width {width}"
+            ),
+            Self::VectorEncoding(message) => {
+                write!(formatter, "invalid vector encoding: {message}")
+            }
+            Self::WidthMismatch { expected, actual } => {
+                write!(formatter, "expected width {expected}, found {actual}")
+            }
             Self::Overflow => formatter.write_str("VHDL value overflow"),
             Self::ZeroDivisor => formatter.write_str("division by zero"),
             Self::IntegerRange {
