@@ -3,6 +3,7 @@ mod codec;
 mod files;
 mod identity;
 mod model;
+pub mod store;
 mod validate;
 
 pub use codec::{
