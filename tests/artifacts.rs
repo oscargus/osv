@@ -276,6 +276,8 @@ fn artifact_secondary_units_require_exact_primary_links() {
     artifact.payload = ArtifactPayload::Analysis(AnalysisArtifact {
         unit: UnitId(8),
         declarations: Vec::new(),
+        objects: Vec::new(),
+        pending_processes: Vec::new(),
     });
     assert!(matches!(
         artifact.validate(artifact.stage()),

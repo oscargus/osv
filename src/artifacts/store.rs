@@ -87,6 +87,7 @@ pub enum StoreError {
     Io(std::io::Error),
     InvalidCatalog(String),
     ConcurrentUpdate,
+    IncompleteAnalysis(UnitIdentity),
     Missing(UnitIdentity),
     Stale(UnitIdentity),
     NativeCompatibility,
@@ -106,6 +107,9 @@ impl fmt::Display for StoreError {
             }
             Self::ConcurrentUpdate => {
                 formatter.write_str("library catalog changed; reopen before publishing")
+            }
+            Self::IncompleteAnalysis(identity) => {
+                write!(formatter, "process analysis is incomplete for {identity:?}")
             }
             Self::Missing(identity) => {
                 write!(formatter, "missing stored unit/version {identity:?}")
@@ -244,6 +248,10 @@ impl LibraryStore {
             .ok_or_else(|| StoreError::Missing(identity.clone()))?;
         let path = self.artifact_path(fingerprint);
         let artifact = load(&path, Some(ArtifactStage::Analysis), self.options.limits)?;
+        if matches!(&artifact.payload, super::ArtifactPayload::Analysis(analysis) if !analysis.pending_processes.is_empty())
+        {
+            return Err(StoreError::IncompleteAnalysis(artifact.identity.clone()));
+        }
         if artifact.identity != identity.normalized()
             || artifact.fingerprint().map_err(CodecError::Validation)? != fingerprint
             || artifact.language != entry.language
@@ -263,6 +271,10 @@ impl LibraryStore {
         artifact
             .validate(ArtifactStage::Analysis)
             .map_err(CodecError::Validation)?;
+        if matches!(&artifact.payload, super::ArtifactPayload::Analysis(analysis) if !analysis.pending_processes.is_empty())
+        {
+            return Err(StoreError::IncompleteAnalysis(artifact.identity.clone()));
+        }
         if artifact.identity.library != self.catalog.library {
             return Err(StoreError::ContentMismatch);
         }

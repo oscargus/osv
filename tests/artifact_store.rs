@@ -90,6 +90,8 @@ fn secondary(primary: &ArtifactEnvelope, kind: UnitKind, marker: &str) -> Artifa
     artifact.payload = ArtifactPayload::Analysis(AnalysisArtifact {
         unit: UnitId(8),
         declarations: Vec::new(),
+        objects: Vec::new(),
+        pending_processes: Vec::new(),
     });
     artifact.dependencies = vec![dependency(primary, DependencyRole::Declaration)];
     let mut file = artifact.sources[0].file.clone();

@@ -1,9 +1,10 @@
 use serde::{Deserialize, Serialize};
 
+use crate::analysis::{ObjectDeclaration, PendingProcess};
 use crate::intrinsics::{NativeBinding, NativeType, Operator};
 use crate::source::{ByteSpan, SourceFile};
 
-pub const SCHEMA_VERSION: u32 = 3;
+pub const SCHEMA_VERSION: u32 = 4;
 pub const COMPILER_COMPATIBILITY: u32 = 1;
 pub const NATIVE_ABI_VERSION: u32 = 1;
 
@@ -196,6 +197,8 @@ pub struct NativeRequirement {
 pub struct AnalysisArtifact {
     pub unit: UnitId,
     pub declarations: Vec<SymbolId>,
+    pub objects: Vec<ObjectDeclaration>,
+    pub pending_processes: Vec<PendingProcess>,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]

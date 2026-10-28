@@ -64,6 +64,8 @@ pub fn sample() -> ArtifactEnvelope {
         payload: ArtifactPayload::Analysis(AnalysisArtifact {
             unit: UnitId(7),
             declarations: vec![SymbolId(5)],
+            objects: Vec::new(),
+            pending_processes: Vec::new(),
         }),
     }
 }

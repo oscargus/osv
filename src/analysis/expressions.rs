@@ -84,7 +84,10 @@ fn compatible(left: NativeType, right: NativeType) -> bool {
     base(left) == base(right)
 }
 
-fn check_value(value: PrimitiveValue, native: NativeType) -> Result<(), ExpressionError> {
+pub(crate) fn check_value(
+    value: PrimitiveValue,
+    native: NativeType,
+) -> Result<(), ExpressionError> {
     let registry = IntrinsicRegistry::standard();
     if let Some(definition) = registry
         .types()
@@ -126,6 +129,13 @@ impl ExpressionPlan {
         artifact
             .validate(artifact.stage())
             .map_err(|error| ExpressionError::Invalid(error.to_string()))?;
+        self.validate_in_context(artifact)
+    }
+
+    pub(crate) fn validate_in_context(
+        &self,
+        artifact: &ArtifactEnvelope,
+    ) -> Result<(), ExpressionError> {
         let mut previous = BTreeMap::new();
         let registry = IntrinsicRegistry::standard();
         for node in &self.nodes {

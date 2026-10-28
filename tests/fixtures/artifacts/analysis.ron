@@ -1,5 +1,5 @@
 ArtifactEnvelope(
-    schema_version: 3,
+    schema_version: 4,
     compiler_compatibility: 1,
     compiler_version: "synthetic fixture",
     language: Vhdl2008,
@@ -33,5 +33,5 @@ ArtifactEnvelope(
     )],
     dependencies: [],
     native_requirements: [],
-    payload: Analysis((unit: UnitId(7), declarations: [SymbolId(5)])),
+    payload: Analysis((unit: UnitId(7), declarations: [SymbolId(5)], objects: [], pending_processes: [])),
 )

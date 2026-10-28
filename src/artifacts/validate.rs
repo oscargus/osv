@@ -5,6 +5,7 @@ use std::{
 };
 
 use super::ScopeId;
+use super::SymbolId;
 use crate::source::{ByteSpan, SourceId};
 
 use super::{
@@ -46,6 +47,12 @@ pub enum ArtifactError {
     InvalidName,
     InvalidType(u32),
     InvalidSymbol(u32),
+    InvalidObject(SymbolId),
+    InvalidProcess(ScopeId),
+    InvalidInitialization {
+        symbol: SymbolId,
+        message: String,
+    },
     InvalidSpan(ByteSpan),
     SourceFingerprint(SourceId),
     MissingSourceBytes(SourceId),
@@ -87,6 +94,15 @@ impl fmt::Display for ArtifactError {
                 "invalid type definition or declaration for ID {id}"
             ),
             Self::InvalidSymbol(id) => write!(formatter, "invalid symbol declaration for ID {id}"),
+            Self::InvalidObject(id) => {
+                write!(formatter, "invalid analyzed object declaration {}", id.0)
+            }
+            Self::InvalidProcess(id) => write!(formatter, "invalid pending process scope {}", id.0),
+            Self::InvalidInitialization { symbol, message } => write!(
+                formatter,
+                "invalid initialization for object {}: {message}",
+                symbol.0
+            ),
             Self::InvalidSpan(span) => write!(
                 formatter,
                 "invalid source {} byte span {}..{}",
@@ -398,6 +414,7 @@ impl ArtifactEnvelope {
             }
         }
         self.validate_native()?;
+        self.validate_unit_data()?;
         let root = match &self.payload {
             ArtifactPayload::Analysis(analysis) => {
                 let unit = reference(&units, analysis.unit, analysis.unit.0, TableKind::Unit)?;

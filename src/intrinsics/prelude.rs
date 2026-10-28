@@ -210,6 +210,8 @@ pub fn standard_prelude() -> Result<ArtifactEnvelope, PreludeError> {
         payload: ArtifactPayload::Analysis(AnalysisArtifact {
             unit: UnitId(0),
             declarations,
+            objects: Vec::new(),
+            pending_processes: Vec::new(),
         }),
     };
     artifact.validate(ArtifactStage::Analysis)?;

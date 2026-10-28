@@ -6,6 +6,7 @@ mod model;
 mod native;
 mod scopes;
 pub mod store;
+mod unit_data;
 mod validate;
 
 pub use codec::{

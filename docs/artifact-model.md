@@ -9,7 +9,7 @@ commands and library catalogs belong to `009` and `010`.
 
 ## Envelope and References
 
-`ArtifactEnvelope` carries schema version `3`, compiler compatibility epoch
+`ArtifactEnvelope` carries schema version `4`, compiler compatibility epoch
 `1`, a diagnostic compiler-version string, the sole `Vhdl2008` revision,
 logical unit identity, source/unit/type/symbol tables, exact dependencies,
 native declaration-set fingerprints and ABI requirements, and a typed payload.
@@ -76,6 +76,15 @@ native ABI remain `1`. This is persistence/validation only: name lookup and
 syntax registration are implemented separately by child `016b`; see
 [scopes-and-names.md](scopes-and-names.md). These do not imply type checking or
 an implemented analysis command.
+
+## Analyzed Unit Data
+
+Schema `4` adds typed object initialization and explicit pending-process
+source/scope records to analysis payloads. Embedded expression validation uses
+a prevalidated context boundary rather than recursively validating the same
+envelope. Pending data is inspectable/convertible but cannot be published as
+a successful library entry. See [analyzed-unit-data.md](analyzed-unit-data.md).
+Source unit/process analysis remains separately owned by `019b`/`020`.
 
 ## Source Fidelity
 

@@ -381,6 +381,22 @@ pure/effectful folding probe belongs to `018a`.
 - **Done When:** A small complete design has typed declarations and a clear boundary for process analysis.
 - **Do Not:** Include hierarchy, port maps, generics, or generate statements in this slice.
 
+Complete these ordered `019` children before `020`.
+
+#### [x] 019a - Persist Analyzed Object and Process Boundaries
+
+- **Work:** Add owned typed object initialization data and explicit pending-process source/scope boundaries to analysis payloads. Validate embedded expression plans without recursive envelope validation, bump incompatible schema deliberately, and prevent incomplete process analysis from being published as a successful library entry.
+- **Checks:** Round-trip initialized/default objects and pending boundaries in both formats; reject bad symbol/type/source/scope references and malformed initialization plans; verify incomplete-publication rejection and run affected artifact/store checks plus required Rust gates.
+- **Done When:** Unit analysis has a validated persistence contract for typed declarations and an explicit, nonexecutable process-analysis boundary.
+
+**Handoff (2026-10-27):** Complete. See [docs/analyzed-unit-data.md](docs/analyzed-unit-data.md), [src/analysis/unit_data.rs](src/analysis/unit_data.rs), and [src/artifacts/unit_data.rs](src/artifacts/unit_data.rs). Schema `4` adds owned object default/expression initialization and explicit nonexecutable pending-process label/scope/source records, preserving semantic order. Validation checks symbol/type/ownership/duplicate/reference/default-kind and embedded-plan integrity; `ExpressionPlan::validate_in_context` avoids recursive envelope validation. The first existing expression-parity check passed immediately after the boundary refactor; the first embedded initializer both-codec test then passed without recursion. `LibraryStore` refuses publication and graph loading of pending-process artifacts with `IncompleteAnalysis`, before store writes. Five unit-data tests cover exact default/expression/pending persistence, malformed embedded plans and references, invalid default/type/kind, and the no-files publication barrier. All 43 affected artifact/codec/store/command tests passed; root formatting/check/strict Clippy/all-target tests pass (157 total). No dependencies, parser AST persistence, process semantics/execution, source unit analyzer, or CLI stage changed. No blockers; parent `019` remains unchecked until `019b` analyzes real portless entity/architecture fixtures and populates this data. `020` must discharge pending bodies with actual typed processes, never clear them as no-ops.
+
+#### [ ] 019b - Analyze Minimal Entity and Architecture Sources
+
+- **Work:** Consume syntax/name/prelude/expression APIs to analyze portless entities and associated architectures with initial scalar constants/signals. Preserve defaults, secondary identity, and source context; retain explicit pending process boundaries for `020`, and diagnose unsupported constructs rather than discarding them.
+- **Checks:** Use VHDL fixtures for a legal design, missing/wrong entity associations, duplicate objects, initializer type/range failures, source-linked unsupported constructs, both-format owned results, and required Rust gates.
+- **Done When:** A small complete design has typed declaration/initialization data and explicit process boundaries without hierarchy/ports/generics/generate or premature process execution.
+
 ### [ ] 020 - Analyze a Linear Process Subset
 
 - **Work:** Add scalar signal/variable assignment, `wait for`, indefinite `wait`, `assert`, and `report` to process IR. Establish initial-process execution and variable-versus-signal semantics. Preserve continuation locations and severity information.
