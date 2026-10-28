@@ -64,6 +64,8 @@ pub enum DiagnosticCode {
     Arithmetic,
     LiteralRange,
     AmbiguousOverload,
+    MissingInitializer,
+    NameMismatch,
 }
 
 impl fmt::Display for DiagnosticCode {
@@ -91,6 +93,8 @@ impl fmt::Display for DiagnosticCode {
             Self::Arithmetic => "OSV-ARITHMETIC",
             Self::LiteralRange => "OSV-LITERAL-RANGE",
             Self::AmbiguousOverload => "OSV-AMBIGUOUS-OVERLOAD",
+            Self::MissingInitializer => "OSV-MISSING-INITIALIZER",
+            Self::NameMismatch => "OSV-NAME-MISMATCH",
         })
     }
 }

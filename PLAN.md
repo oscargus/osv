@@ -2,7 +2,7 @@
 
 This is an execution plan for the simulator described in [project.md](project.md), including the additional requirement that artifacts use binary serialization by default and also support inspectable RON serialization.
 
-Chunks `001`-`018` are complete, covering the foundation, artifact tools/store, values/bounds/vector storage, the syntax adapter, scoped declarations, trusted prelude/intrinsics, and initial typed scalar expressions. Chunk `004` has passing hosted checks on Linux x86-64/ARM64, Windows, and macOS. Full VHDL analysis, elaboration, and simulation are not implemented; checked chunks and their handoffs record verified progress.
+Chunks `001`-`019` are complete, covering the foundation, artifact tools/store, values/bounds/vector storage, syntax/scopes/prelude, scalar expressions, and initial entity/architecture declaration analysis. Chunk `004` has passing hosted checks on Linux x86-64/ARM64, Windows, and macOS. Full VHDL analysis, elaboration, and simulation are not implemented; checked chunks and their handoffs record verified progress.
 
 ## How to Run This Plan
 
@@ -374,7 +374,7 @@ pure/effectful folding probe belongs to `018a`.
 
 ## C. First End-to-End Simulation
 
-### [ ] 019 - Analyze Minimal Entities and Architectures
+### [x] 019 - Analyze Minimal Entities and Architectures
 
 - **Work:** Analyze an entity without ports and an associated architecture containing initial scalar constants/signals and processes. Preserve architecture identity, object declarations, default initialization, and source context.
 - **Checks:** Cover one legal design, missing/wrong entity associations, duplicate object names, initializer type errors, and unsupported constructs diagnosed at their source.
@@ -391,11 +391,13 @@ Complete these ordered `019` children before `020`.
 
 **Handoff (2026-10-27):** Complete. See [docs/analyzed-unit-data.md](docs/analyzed-unit-data.md), [src/analysis/unit_data.rs](src/analysis/unit_data.rs), and [src/artifacts/unit_data.rs](src/artifacts/unit_data.rs). Schema `4` adds owned object default/expression initialization and explicit nonexecutable pending-process label/scope/source records, preserving semantic order. Validation checks symbol/type/ownership/duplicate/reference/default-kind and embedded-plan integrity; `ExpressionPlan::validate_in_context` avoids recursive envelope validation. The first existing expression-parity check passed immediately after the boundary refactor; the first embedded initializer both-codec test then passed without recursion. `LibraryStore` refuses publication and graph loading of pending-process artifacts with `IncompleteAnalysis`, before store writes. Five unit-data tests cover exact default/expression/pending persistence, malformed embedded plans and references, invalid default/type/kind, and the no-files publication barrier. All 43 affected artifact/codec/store/command tests passed; root formatting/check/strict Clippy/all-target tests pass (157 total). No dependencies, parser AST persistence, process semantics/execution, source unit analyzer, or CLI stage changed. No blockers; parent `019` remains unchecked until `019b` analyzes real portless entity/architecture fixtures and populates this data. `020` must discharge pending bodies with actual typed processes, never clear them as no-ops.
 
-#### [ ] 019b - Analyze Minimal Entity and Architecture Sources
+#### [x] 019b - Analyze Minimal Entity and Architecture Sources
 
 - **Work:** Consume syntax/name/prelude/expression APIs to analyze portless entities and associated architectures with initial scalar constants/signals. Preserve defaults, secondary identity, and source context; retain explicit pending process boundaries for `020`, and diagnose unsupported constructs rather than discarding them.
 - **Checks:** Use VHDL fixtures for a legal design, missing/wrong entity associations, duplicate objects, initializer type/range failures, source-linked unsupported constructs, both-format owned results, and required Rust gates.
 - **Done When:** A small complete design has typed declaration/initialization data and explicit process boundaries without hierarchy/ports/generics/generate or premature process execution.
+
+**Handoff (2026-10-28):** Complete; both `019` children satisfy the parent. See [docs/analyzed-unit-data.md](docs/analyzed-unit-data.md), [src/analysis/source_units.rs](src/analysis/source_units.rs), and [tests/source_units.rs](tests/source_units.rs). Added real source-to-owned `analyze_units` for portless entities and associated architectures, with typed initial scalar constants/signals, correct subtype defaults, inherited constant visibility, exact primary dependencies, retained source context, and explicit labelled/unlabelled process boundaries. Unsupported interfaces/generate/declarations/concurrent statements fail at their source; pending bodies remain nonexecutable and unpublishable until `020`. The first empty-entity owned/both-codec check passed immediately after the small edit. Real fixtures exposed and fixed dependency-before-prelude ordering and the parser's `InitialValue` wrapper; the same focused suite was rerun. Five source tests cover legal designs/defaults/dependencies/process boundaries, both encodings, publication safety, missing/wrong parents, duplicates/ending names, unknown types, missing/invalid initializers, and unsupported constructs. Root formatting/check/strict Clippy/all-target tests pass (162 total); editor diagnostics are clean. No dependencies or schema changes beyond `019a`, package bodies, process statement execution, elaboration/simulation, or CLI stage implementation was introduced. No blockers. Stopped after this completed chunk as requested; `020` remains unstarted and must replace pending bodies with actual typed processes rather than clear them as no-ops.
 
 ### [ ] 020 - Analyze a Linear Process Subset
 

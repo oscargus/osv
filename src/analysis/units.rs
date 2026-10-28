@@ -41,7 +41,7 @@ fn error(code: DiagnosticCode, span: ByteSpan, message: impl Into<String>) -> Di
         .with_primary(span, "declaration registration failed")
 }
 
-fn identifier(token: &SyntaxToken) -> Option<Identifier> {
+pub(crate) fn identifier(token: &SyntaxToken) -> Option<Identifier> {
     let text = token.text();
     if let Some(inner) = text
         .strip_prefix('\\')

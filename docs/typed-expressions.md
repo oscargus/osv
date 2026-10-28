@@ -25,8 +25,8 @@ families fail rather than being coerced or assigned arbitrary values.
 
 The records are serializable foundation data, not a new unversioned CLI
 artifact format. Schema `4` embeds them in analysis object initializers;
-see [analyzed-unit-data.md](analyzed-unit-data.md). Source unit integration
-remains `019b`. No parser
+see [analyzed-unit-data.md](analyzed-unit-data.md). Source unit integration is
+implemented by `019b`. No parser
 node, arena, closure, runtime stack, or host binding is stored.
 
 ## Checked Folding
@@ -94,7 +94,7 @@ Expression syntax depth is bounded to 128 and owned nodes to 65,536. Scalar
 parentheses reuse the parser's single unchosen element-association wrapper;
 multiple/named aggregate associations are rejected, not reduced to one element.
 Schema `4` embeds these plans in owned object initialization records;
-source-driven unit integration remains `019b`. No package body is loaded.
+source-driven unit integration is implemented by `019b`. No package body is loaded.
 
 ## Verification
 

@@ -84,7 +84,8 @@ source/scope records to analysis payloads. Embedded expression validation uses
 a prevalidated context boundary rather than recursively validating the same
 envelope. Pending data is inspectable/convertible but cannot be published as
 a successful library entry. See [analyzed-unit-data.md](analyzed-unit-data.md).
-Source unit/process analysis remains separately owned by `019b`/`020`.
+Source unit analysis is implemented by `019b`; process statement analysis
+remains `020`, with pending boundaries explicitly unpublishable.
 
 ## Source Fidelity
 
