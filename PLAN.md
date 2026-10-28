@@ -353,6 +353,23 @@ belongs to `017a`, and no prelude installation has started yet.
 - **Done When:** The initial expression IR is typed and serializable, with no deferred string-based operator lookup.
 - **Do Not:** Attempt full overload resolution, all attributes, or speculative folding of impure expressions here.
 
+Complete chunk `018`'s ordered children below before `019`; the initial
+pure/effectful folding probe belongs to `018a`.
+
+#### [x] 018a - Define Typed Expression Records and Checked Kernels
+
+- **Work:** Add flat source-linked typed expression records with resolved symbol/intrinsic references and checked initial integer/boolean/time kernels. Keep explicit not-yet-static results and serialized data separate from parser nodes and host bindings.
+- **Checks:** Reject invalid references/types/arithmetic; round-trip records in both codecs; prove folded/nonfolded kernel equivalence and never fold report/assert/time observation. Run required Rust gates.
+- **Done When:** Syntax typing can emit serializable typed expressions and reuse the same checked kernels for safe folding without runtime AST interpretation.
+
+**Handoff (2026-10-27):** Complete. See [docs/typed-expressions.md](docs/typed-expressions.md), [src/analysis/expressions.rs](src/analysis/expressions.rs), and [src/analysis/constant.rs](src/analysis/constant.rs). Added flat source-linked typed expression IDs/records for scalar literals, resolved declarations, and exact intrinsic references with earlier operand IDs. Validation rejects malformed references/types/spans/profiles/requirements. Checked selected integer/boolean/time kernels respect native identity/arity/folding policy, with explicit `NotYetStatic` for effects or unavailable constants; signal/variable values cannot become analysis constants. The first integer-add versus time-observation check passed immediately after the small edit. Five tests cover both-codec plans, folded/nonfolded equivalence, invalid references/types, nonstatic data, arithmetic/range/argument errors, and identity/effect guards. Root formatting/check/strict Clippy/all-target tests pass (147 total); large intrinsic metadata was boxed and a local conditional simplified for Clippy, then gates rerun. No dependencies, envelope schema, parser AST persistence, syntax expression typing, runtime scheduler, or package body changed. The records are not a separate CLI artifact schema; analyzed-unit integration remains later work. No blockers; parent `018` remains unchecked until `018b` types real VHDL fixtures and emits the required operand/type diagnostics.
+
+#### [ ] 018b - Type Initial Syntax Expressions and Literals
+
+- **Work:** Consume local syntax views for supported boolean/integer/time literals and names/operators, apply expected native types, and perform safe locally-static folding through `018a`. Preserve precise source/type/operand context and diagnose unsupported expressions explicitly.
+- **Checks:** Use VHDL fixtures for legal expressions, name/type failures, arithmetic/range boundaries, deferred values, and folded/nonfolded agreement; snapshot related operand/type diagnostics and run required Rust gates.
+- **Done When:** Initial expression analysis returns typed owned data with statically resolved operations and no string-based runtime lookup.
+
 ## C. First End-to-End Simulation
 
 ### [ ] 019 - Analyze Minimal Entities and Architectures
