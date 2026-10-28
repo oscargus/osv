@@ -14,6 +14,7 @@ use serde::{Deserialize, Serialize, de::DeserializeOwned};
 pub enum FixtureKind {
     ParserProbe,
     HarnessSelfTest,
+    ExpressionAnalysis,
 }
 
 #[derive(Clone, Debug, Deserialize)]

@@ -69,6 +69,7 @@ pub enum IntrinsicId {
     Report,
     Assert,
     Now,
+    TimeNegate,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]

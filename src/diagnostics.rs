@@ -60,6 +60,10 @@ pub enum DiagnosticCode {
     WrongSecondaryParent,
     MissingLibrary,
     UnsupportedFeature,
+    MissingName,
+    Arithmetic,
+    LiteralRange,
+    AmbiguousOverload,
 }
 
 impl fmt::Display for DiagnosticCode {
@@ -83,6 +87,10 @@ impl fmt::Display for DiagnosticCode {
             Self::WrongSecondaryParent => "OSV-WRONG-SECONDARY-PARENT",
             Self::MissingLibrary => "OSV-MISSING-LIBRARY",
             Self::UnsupportedFeature => "OSV-UNSUPPORTED-FEATURE",
+            Self::MissingName => "OSV-MISSING-NAME",
+            Self::Arithmetic => "OSV-ARITHMETIC",
+            Self::LiteralRange => "OSV-LITERAL-RANGE",
+            Self::AmbiguousOverload => "OSV-AMBIGUOUS-OVERLOAD",
         })
     }
 }

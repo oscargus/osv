@@ -1,0 +1,18 @@
+"[OSV-TYPE-MISMATCH] Error: operator has no unique compatible profile in the initial subset
+   ,-[ fixtures/vhdl/expression-type-error.vhd:2:32 ]
+   |
+ 2 |   constant result : integer := 1 + true;
+   |                                |^^^|^|^
+   |                                |   `----- operator Add cannot accept (integer, boolean)
+   |                                |     |
+   |                                `--------- operand has type integer
+   |                                      |
+   |                                      `--- operand has type boolean
+   |
+   | Note 1: stage: analysis
+   |
+   | Note 2: expected type: one installed native operator profile with compatible operand types
+   |
+   | Note 3: actual type: integer, boolean
+---'
+"

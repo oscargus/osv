@@ -1,0 +1,5 @@
+(
+    kind: ExpressionAnalysis,
+    sources: ["vhdl/expression-boolean.vhd"],
+    expected: (stage: Analysis, diagnostics: [], exit_status: 0, result: Value(Boolean(true)), output: ""),
+)

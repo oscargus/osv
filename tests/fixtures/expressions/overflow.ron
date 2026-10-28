@@ -1,0 +1,5 @@
+(
+    kind: ExpressionAnalysis,
+    sources: ["vhdl/expression-overflow.vhd"],
+    expected: (stage: Analysis, diagnostics: [(stage: Analysis, code: Arithmetic, severity: Error)], exit_status: 1, result: Failed, output: ""),
+)

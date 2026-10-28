@@ -1,0 +1,5 @@
+(
+    kind: ExpressionAnalysis,
+    sources: ["vhdl/expression-type-error.vhd"],
+    expected: (stage: Analysis, diagnostics: [(stage: Analysis, code: TypeMismatch, severity: Error)], exit_status: 1, result: Failed, output: ""),
+)

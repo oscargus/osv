@@ -13,6 +13,7 @@ use vhdl_syntax::{
 };
 
 pub use vhdl_syntax::syntax::{NodeKind, TokenKind};
+pub use vhdl_syntax::tokens::Keyword;
 
 use crate::{
     diagnostics::{Diagnostic, DiagnosticCode, DiagnosticNote, DiagnosticStage, Severity},

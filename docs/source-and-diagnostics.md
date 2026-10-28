@@ -113,8 +113,9 @@ only trailing line whitespace for snapshot comparison and independently reject
 CR/ANSI output. Expected snapshot loading accepts both LF and CRLF checkouts;
 this does not normalize the actual diagnostic output. Chunk `006` shares these
 golden helpers and adds typed fixture metadata; see [fixtures.md](fixtures.md).
-There is no automatic golden-update mode or production parser adapter from
-chunk `015`.
+There is no automatic golden-update mode. The production parser adapter from
+chunk `015` is documented in [syntax-adapter.md](syntax-adapter.md); expression
+analysis adds a checked-in operand/type snapshot in chunk `018`.
 
 ```sh
 cargo test --test source --locked

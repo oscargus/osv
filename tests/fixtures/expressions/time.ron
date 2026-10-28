@@ -1,0 +1,5 @@
+(
+    kind: ExpressionAnalysis,
+    sources: ["vhdl/expression-time.vhd"],
+    expected: (stage: Analysis, diagnostics: [], exit_status: 0, result: Value(Time(TimeValue(1000000))), output: ""),
+)

@@ -1,0 +1,5 @@
+(
+    kind: ExpressionAnalysis,
+    sources: ["vhdl/expression-missing.vhd"],
+    expected: (stage: Analysis, diagnostics: [(stage: Analysis, code: MissingName, severity: Error)], exit_status: 1, result: Failed, output: ""),
+)

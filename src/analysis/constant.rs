@@ -165,6 +165,14 @@ pub fn fold(
         (IntrinsicId::TimeLess, [PrimitiveValue::Time(left), PrimitiveValue::Time(right)]) => {
             PrimitiveValue::Boolean(left.0 < right.0)
         }
+        (IntrinsicId::TimeNegate, [PrimitiveValue::Time(value)]) => {
+            PrimitiveValue::Time(TimeValue(
+                IntegerValue(value.0)
+                    .checked_neg()
+                    .map_err(EvaluationError::Value)?
+                    .0,
+            ))
+        }
         _ => return Err(EvaluationError::UnsupportedIntrinsic(reference.id)),
     };
     Ok(FoldResult::Value(result))

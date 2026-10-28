@@ -138,6 +138,7 @@ pub(super) fn operations() -> Vec<IntrinsicDefinition> {
             &[Time, Time],
             Boolean,
         ),
+        scalar(IntrinsicId::TimeNegate, Operator::Subtract, &[Time], Time),
     ];
     for (id, statement, arguments, effects) in [
         (

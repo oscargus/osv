@@ -49,6 +49,9 @@ Each metadata file names an explicit fixture kind:
   using manually constructed records. Such a result is never a successful
   run of the simulator. The artifact/elaboration/trace samples are labelled
   `self-test` and use `synthetic.*` names; they do not define production IR.
+- `ExpressionAnalysis` calls the real initial scalar expression-analysis API
+  with a supplied typed context and VHDL fixture. It is not a full successful
+  unit analysis or simulation. See [typed-expressions.md](typed-expressions.md).
 
 For example,
 [../tests/fixtures/parser/incomplete-entity.ron](../tests/fixtures/parser/incomplete-entity.ron)
